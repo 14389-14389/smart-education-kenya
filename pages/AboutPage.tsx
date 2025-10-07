@@ -15,7 +15,7 @@ const AboutPage: React.FC = () => {
             {/* Lucky Kitonyi */}
             <div className="bg-white pt-20 p-8 rounded-lg shadow-xl flex flex-col items-center text-center relative">
               <img
-                src="/assets/lucky-kitonyi.jpg"
+                src="/assets/lucky kitonyi.jpg"
                 alt="Lucky Kitonyi, Founder"
                 className="rounded-full shadow-2xl w-40 h-40 object-cover border-8 border-white absolute -top-20"
               />
@@ -37,7 +37,7 @@ const AboutPage: React.FC = () => {
             {/* Kevin Muli */}
             <div className="bg-white pt-20 p-8 rounded-lg shadow-xl flex flex-col items-center text-center relative">
               <img
-                src="/assets/kevin-muli.jpg"
+                src="/assets/muli kevin.jpg"
                 alt="Kevin Muli, Co-Founder"
                 className="rounded-full shadow-2xl w-40 h-40 object-cover border-8 border-white absolute -top-20"
               />
