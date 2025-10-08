@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Education as the Great Equalizer in Rural Kenya</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100">
+  <main class="max-w-5xl mx-auto my-10 p-6 bg-white rounded-2xl shadow-lg">
+    <header class="flex gap-4 items-center flex-wrap">
+      <img alt="Rural Education" src="/assets/rural-education.jpg" class="w-24 h-24 object-cover rounded-lg hidden md:block"/>
+      <div>
+        <h1 class="text-2xl font-bold text-green-700">Education as the Great Equalizer in Rural Kenya</h1>
+        <p class="text-gray-600 mt-1">
+          In many parts of Kenya, the gap between potential and opportunity is vast. Education stands as the single most powerful tool to bridge this divide.
+        </p>
+        <div class="flex flex-wrap gap-3 mt-3 items-center text-sm text-gray-500">
+          <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
+            Feature: Rural Education
+          </span>
+          <time datetime="2024-10-15">Published: Oct 15, 2024</time>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid md:grid-cols-[1fr_320px] gap-5 mt-7" id="overview">
+      <div>
+        <article class="bg-white p-5 rounded-xl shadow-inner border border-gray-100">
+          <h2 class="text-lg font-semibold mb-2">Overview</h2>
+          <p>
+            Access to quality education in rural Kenya remains a critical challenge. Many children face barriers such as distance to schools, lack of learning materials, and under-resourced facilities. Despite these obstacles, education has the power to level the playing field, giving every child the chance to thrive.
+          </p>
+
+          <h2 class="text-lg font-semibold mt-4 mb-2">Why education matters</h2>
+          <ul class="list-disc list-inside space-y-1">
+            <li><strong>Bridges inequality:</strong> Education empowers marginalized communities to access opportunities that were previously out of reach.</li>
+            <li><strong>Drives local economies:</strong> Educated youth are more likely to start businesses, innovate, and contribute to rural development.</li>
+            <li><strong>Improves health and well-being:</strong> Literate communities are better informed on health, nutrition, and hygiene.</li>
+            <li><strong>Strengthens civic participation:</strong> Education nurtures informed citizens who can advocate for better governance.</li>
+          </ul>
+
+          <h2 class="text-lg font-semibold mt-4 mb-2">Key areas to invest in</h2>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Teacher training and support</li>
+            <li>Infrastructure: classrooms, libraries, and sanitation facilities</li>
+            <li>Scholarships and bursaries for vulnerable learners</li>
+            <li>Community-based learning initiatives</li>
+          </ul>
+
+          <div class="flex gap-3 mt-4">
+            <button class="bg-green-700 text-white px-4 py-2 rounded-lg font-semibold" onclick="window.print()">
+              Print / Save
+            </button>
+            <button class="border border-green-200 text-green-700 px-4 py-2 rounded-lg font-semibold" onclick="document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })">
+              Contact Program
+            </button>
+          </div>
+        </article>
+
+        <article class="bg-white p-5 rounded-xl shadow-inner border border-gray-100 mt-5">
+          <h2 class="text-lg font-semibold mb-2">Case spotlight</h2>
+          <p>
+            In one rural county, investment in mobile libraries increased literacy rates by 22% within two years. Students gained access to books and learning materials that sparked curiosity and improved reading skills. The program also trained local volunteers, creating a sustainable model for educational growth.
+          </p>
+          <blockquote class="italic border-l-4 border-green-100 pl-3 mt-3 text-gray-800">
+            "Books became our windows to the world. Even without internet, we could dream bigger." — Peter, 14, student
+          </blockquote>
+        </article>
+      </div>
+
+      <aside class="space-y-5">
+        <div class="bg-white p-5 rounded-xl shadow-inner border border-gray-100">
+          <h2 class="text-lg font-semibold mb-2">Ways to support</h2>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Donate textbooks or digital learning devices</li>
+            <li>Volunteer for rural teaching programs</li>
+            <li>Fund classroom construction projects</li>
+            <li>Partner with local schools for mentorship programs</li>
+          </ul>
+
+          <h2 class="text-lg font-semibold mt-4 mb-2">Quick facts</h2>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Average distance to school: 7–10 km</li>
+            <li>Teacher-student ratio: 1:45 in many areas</li>
+            <li>Literacy rates improving by 3–5% annually</li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-inner border border-gray-100">
+          <h2 class="text-lg font-semibold mb-2">Get resources</h2>
+          <p>Download our toolkit for supporting rural education initiatives.</p>
+          <div class="flex gap-3 mt-3">
+            <a href="/resources/rural-education-toolkit.pdf" download class="bg-green-700 text-white px-4 py-2 rounded-lg font-semibold">
+              Download PDF
+            </a>
+            <a href="#contact" class="border border-green-200 text-green-700 px-4 py-2 rounded-lg font-semibold">
+              Request support
+            </a>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer id="contact" class="mt-8 pt-5 border-t border-gray-100 flex flex-wrap justify-between gap-3 text-sm text-gray-600">
+      <div>
+        <strong>Contact the Education Support Team</strong>
+        <div class="mt-1">
+          Email: <a href="mailto:education@example.org" class="text-green-700">education@example.org</a> — Phone: +254 711 000 000
+        </div>
+      </div>
+      <div class="text-right">
+        <div>Share this page:</div>
+        <div class="mt-2 flex gap-2 justify-end">
+          <button class="border border-green-200 text-green-700 px-3 py-1 rounded-lg" onclick="if (navigator.share) { navigator.share({ title: document.title, url: window.location.href }); } else { alert('Sharing not supported'); }">
+            Share
+          </button>
+          <button class="bg-green-700 text-white px-3 py-1 rounded-lg" onclick="history.back()">
+            Back
+          </button>
+        </div>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>

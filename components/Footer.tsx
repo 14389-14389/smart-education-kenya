@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
             “Smart Education – Empowering Minds, Shaping Futures.”
             </p>
             <p className="text-sm text-bright-blue-200">
-            © 2025 Smart Education | Founded by Lucky Kitonyi.
+            © 2025 Smart Education | Founded by Lucky Kitonyi & Kevin Muli.
             </p>
         </div>
       </div>

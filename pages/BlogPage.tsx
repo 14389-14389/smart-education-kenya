@@ -21,7 +21,7 @@ const BlogPage: React.FC = () => {
                   <p className="text-sm text-gray-500 mb-2">{post.date}</p>
                   <h2 className="text-2xl font-bold text-bright-blue-700 mb-3">{post.title}</h2>
                   <p className="text-gray-600 leading-relaxed">{post.excerpt}</p>
-                   <a href="#" className="text-bright-blue-600 hover:underline mt-4 font-semibold self-start">Read More &rarr;</a>
+                   <a href="Mentorship.html" className="text-bright-blue-600 hover:underline mt-4 font-semibold self-start">Read More &rarr;</a>
                 </div>
               </div>
             ))}

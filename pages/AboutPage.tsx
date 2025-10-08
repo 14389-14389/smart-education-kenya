@@ -37,7 +37,7 @@ const AboutPage: React.FC = () => {
             {/* Kevin Muli */}
             <div className="bg-white pt-20 p-8 rounded-lg shadow-xl flex flex-col items-center text-center relative">
               <img
-                src="/assets/muli kevin.jpg"
+                src="/assets/kevinmuli1.jpg"
                 alt="Kevin Muli, Co-Founder"
                 className="rounded-full shadow-2xl w-40 h-40 object-cover border-8 border-white absolute -top-20"
               />
