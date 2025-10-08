@@ -16,18 +16,19 @@ const Header: React.FC = () => {
 
   return (
     <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
         <div className="flex items-center justify-between">
+          {/* ✅ Logo */}
           <NavLink
             to="/"
-            className="flex items-center text-2xl font-bold text-bright-blue-700 hover:text-bright-blue-900 transition"
+            className="flex items-center text-lg sm:text-xl font-bold text-bright-blue-700 hover:text-bright-blue-900 transition"
           >
-            <LogoIcon className="h-8 w-8 mr-2" />
-            Smart Education
+            <LogoIcon className="h-6 w-6 sm:h-8 sm:w-8 mr-2 flex-shrink-0" />
+            <span className="truncate">Smart Education</span>
           </NavLink>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* ✅ Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {mainNavLinks.map((link) => (
               <NavLink
                 key={link.href}
@@ -46,18 +47,18 @@ const Header: React.FC = () => {
             {donateLink && (
               <NavLink
                 to={donateLink.href}
-                className="bg-bright-blue-600 hover:bg-bright-blue-700 text-white font-bold py-2 px-5 rounded-full transition duration-300 transform hover:scale-105"
+                className="bg-bright-blue-600 hover:bg-bright-blue-700 text-white font-bold py-2 px-4 lg:px-5 rounded-full transition duration-300 transform hover:scale-105 whitespace-nowrap"
               >
                 {donateLink.label}
               </NavLink>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* ✅ Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 focus:outline-none"
+              className="text-gray-700 focus:outline-none p-2"
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -66,18 +67,18 @@ const Header: React.FC = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu Panel */}
+      {/* ✅ Mobile Menu Panel (Slide Down) */}
       <div
-        className={`fixed inset-0 bg-bright-blue-800 bg-opacity-95 z-50 transform ${
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed inset-x-0 top-0 bg-bright-blue-800 bg-opacity-95 z-40 transform ${
+          isMenuOpen ? 'translate-y-0' : '-translate-y-full'
         } transition-transform duration-300 ease-in-out md:hidden`}
       >
-        <div className="flex flex-col items-center justify-center h-full px-4 space-y-6">
+        <div className="flex flex-col items-center justify-center h-screen px-4 space-y-6">
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.href}
               to={link.href}
-              className={`block w-full text-center text-2xl sm:text-3xl font-bold py-2 transition ${
+              className={`block w-full text-center text-2xl font-bold py-2 transition ${
                 link.href === '/donate'
                   ? 'bg-white text-bright-blue-700 px-6 py-3 rounded-full'
                   : 'text-white hover:text-bright-blue-200'
