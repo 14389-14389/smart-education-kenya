@@ -1,55 +1,171 @@
-
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import AnimatedPage from '../components/AnimatedPage';
-import { SOCIAL_LINKS } from '../constants';
+
+// ✅ Google Apps Script Web App URLs
+const VOLUNTEER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLzMq9JFYGR9x3Kq_Ee4veq9pNOtRWD2vGekgZ2j8Ew1r0EOao6dk-58lvlvj3cPD-/exec';
+const PARTNER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznPakUuZxJ7gn72qmseMH7y35LxrxjH0cTgB0ZiE0jrfQHyPjeJWeznRkPXZVpQzh6/exec';
 
 const GetInvolvedPage: React.FC = () => {
+  const [showVolunteerForm, setShowVolunteerForm] = useState(false);
+  const [showPartnerForm, setShowPartnerForm] = useState(false);
+
+  const [volunteerData, setVolunteerData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    interest: '',
+    message: '',
+  });
+
+  const [partnerData, setPartnerData] = useState({
+    organization: '',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    partnershipType: '',
+    message: '',
+  });
+
+  const [volunteerSubmitted, setVolunteerSubmitted] = useState(false);
+  const [partnerSubmitted, setPartnerSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleVolunteerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setVolunteerData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handlePartnerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setPartnerData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitVolunteer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await fetch(VOLUNTEER_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(volunteerData),
+      });
+      setVolunteerSubmitted(true);
+      setVolunteerData({ fullName: '', email: '', phone: '', interest: '', message: '' });
+    } catch (error) {
+      console.error('Volunteer submission failed:', error);
+      alert('Failed to submit volunteer form. Please try again.');
+    }
+    setLoading(false);
+  };
+
+  const submitPartner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await fetch(PARTNER_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(partnerData),
+      });
+      setPartnerSubmitted(true);
+      setPartnerData({ organization: '', contactPerson: '', email: '', phone: '', partnershipType: '', message: '' });
+    } catch (error) {
+      console.error('Partner submission failed:', error);
+      alert('Failed to submit partner form. Please try again.');
+    }
+    setLoading(false);
+  };
+
   return (
     <AnimatedPage>
-      <div className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold text-bright-blue-800">Get Involved</h1>
-            <p className="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">You have the power to change a life. Join us as a volunteer, partner, or advocate to make a lasting impact.</p>
+      <div className="py-20 bg-gray-50 min-h-screen">
+        <div className="container mx-auto px-6 max-w-3xl">
+          <h1 className="text-4xl font-bold text-center text-bright-blue-800 mb-6">
+            Get Involved
+          </h1>
+
+          {/* ✨ Motivational Section */}
+          <div className="text-center mb-10">
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
+              🌟 <strong>Your time, voice, and partnership can spark a brighter future for thousands of young learners.</strong><br />
+              Whether you choose to volunteer or collaborate with us, your involvement goes far beyond today — it plants seeds of hope, opportunity, and lasting change.
+            </p>
+            <p className="mt-4 text-gray-600 italic">
+              Join our mission to empower the next generation. <strong>Be the reason a dream comes true.</strong>
+            </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Become a Volunteer */}
-            <div className="bg-gray-50 p-8 rounded-lg shadow-lg">
-              <h2 className="text-3xl font-bold text-bright-blue-700 mb-4">Become a Volunteer</h2>
-              <p className="text-gray-700 mb-6 leading-relaxed">
-                Lend your time and skills to make a direct impact. We are looking for passionate individuals to help with mentorship, event organization, and administrative support. Your dedication can inspire a student to pursue their dreams.
-              </p>
-              <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                <li>Mentor a student</li>
-                <li>Facilitate a workshop</li>
-                <li>Help organize donation drives</li>
-                <li>Provide administrative support</li>
-              </ul>
-              <div className="flex flex-col sm:flex-row gap-4">
-                  <a href="tel:+254742180636" className="text-center flex-1 bg-bright-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-bright-blue-700 transition">Call Us</a>
-                  <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noopener noreferrer" className="text-center flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition">WhatsApp Us</a>
-                  <a href="mailto:starletlucky71@gmail.com" className="text-center flex-1 bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-800 transition">Email Us</a>
-              </div>
-            </div>
+          {/* BUTTONS SECTION */}
+          <div className="flex flex-col md:flex-row gap-6 justify-center mb-10">
+            <button
+              onClick={() => {
+                setShowVolunteerForm(!showVolunteerForm);
+                setShowPartnerForm(false);
+              }}
+              className="flex-1 bg-bright-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-bright-blue-700 transition"
+            >
+              Volunteer With Us
+            </button>
 
-            {/* Partner With Us */}
-            <div className="bg-gray-50 p-8 rounded-lg shadow-lg">
-              <h2 className="text-3xl font-bold text-bright-blue-700 mb-4">Partner With Us</h2>
-              <p className="text-gray-700 mb-6 leading-relaxed">
-                Corporations, schools, and other organizations can play a crucial role in our mission. We welcome partnerships for corporate social responsibility (CSR) initiatives, event sponsorships, and in-kind donations of school materials or sanitary products.
-              </p>
-              <p className="text-gray-700 mb-6">
-                Let's collaborate to create a sustainable and impactful program that benefits the entire community. Contact us today to discuss how we can work together.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                  <a href="tel:+254742180636" className="text-center flex-1 bg-bright-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-bright-blue-700 transition">Call to Partner</a>
-                  <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noopener noreferrer" className="text-center flex-1 bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition">WhatsApp</a>
-                  <a href="mailto:starletlucky71@gmail.com" className="text-center flex-1 bg-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-800 transition">Email for Partnership</a>
-              </div>
-            </div>
+            <button
+              onClick={() => {
+                setShowPartnerForm(!showPartnerForm);
+                setShowVolunteerForm(false);
+              }}
+              className="flex-1 bg-yellow-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-yellow-600 transition"
+            >
+              Partner With Us
+            </button>
           </div>
+
+          {/* VOLUNTEER FORM */}
+          {showVolunteerForm && (
+            <div className="bg-white p-8 rounded-xl shadow-lg mb-12 transition-all duration-500">
+              <h2 className="text-2xl font-bold text-bright-blue-700 mb-4 text-center">Volunteer Sign-Up</h2>
+              {volunteerSubmitted ? (
+                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded text-center">
+                  ✅ Thank you for signing up to volunteer! We'll be in touch soon.
+                </div>
+              ) : (
+                <form onSubmit={submitVolunteer} className="space-y-4">
+                  <input name="fullName" placeholder="Full Name" value={volunteerData.fullName} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
+                  <input name="email" type="email" placeholder="Email" value={volunteerData.email} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
+                  <input name="phone" placeholder="Phone Number" value={volunteerData.phone} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
+                  <input name="interest" placeholder="Area of Interest (e.g. Mentoring, Events)" value={volunteerData.interest} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
+                  <textarea name="message" placeholder="Message (Optional)" value={volunteerData.message} onChange={handleVolunteerChange} rows={3} className="w-full border rounded p-2"></textarea>
+                  <button type="submit" disabled={loading} className="w-full bg-bright-blue-600 text-white py-2 rounded-lg font-bold hover:bg-bright-blue-700 transition">
+                    {loading ? 'Submitting...' : 'Submit'}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
+
+          {/* PARTNER FORM */}
+          {showPartnerForm && (
+            <div className="bg-white p-8 rounded-xl shadow-lg transition-all duration-500">
+              <h2 className="text-2xl font-bold text-yellow-600 mb-4 text-center">Partner With Us</h2>
+              {partnerSubmitted ? (
+                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded text-center">
+                  ✅ Thank you for your interest in partnering with us. We will reach out shortly.
+                </div>
+              ) : (
+                <form onSubmit={submitPartner} className="space-y-4">
+                  <input name="organization" placeholder="Organization / Name" value={partnerData.organization} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
+                  <input name="contactPerson" placeholder="Contact Person" value={partnerData.contactPerson} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
+                  <input name="email" type="email" placeholder="Email" value={partnerData.email} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
+                  <input name="phone" placeholder="Phone Number" value={partnerData.phone} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
+                  <input name="partnershipType" placeholder="Type of Partnership (e.g. CSR, Sponsorship)" value={partnerData.partnershipType} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
+                  <textarea name="message" placeholder="Message (Optional)" value={partnerData.message} onChange={handlePartnerChange} rows={3} className="w-full border rounded p-2"></textarea>
+                  <button type="submit" disabled={loading} className="w-full bg-yellow-500 text-white py-2 rounded-lg font-bold hover:bg-yellow-600 transition">
+                    {loading ? 'Submitting...' : 'Submit'}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </AnimatedPage>

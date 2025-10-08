@@ -1,101 +1,201 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import AnimatedPage from '../components/AnimatedPage';
 
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyhP4iCHR-t12uFvWFIM3Y8VL5Ju-q6jQ-3lLA5GvYwEStoNoBJk301XjrbkuVWm5j/exec';
+
 const DonatePage: React.FC = () => {
-  // Placeholder data for progress bars
-  const impactGoals = [
-    {
-      title: 'Girls Supported with Sanitary Pads',
-      current: 350,
-      goal: 500,
-      description: "Goal: Provide a year's supply for 500 girls.",
-      color: 'bg-pink-500',
-    },
-    {
-      title: 'Students Equipped with School Supplies',
-      current: 120,
-      goal: 200,
-      description: 'Goal: Equip 200 students for the entire school year.',
-      color: 'bg-yellow-500',
-    },
-    {
-      title: 'Mentorship Workshops Funded',
-      current: 18,
-      goal: 25,
-      description: 'Goal: Fund 25 workshops this semester.',
-      color: 'bg-green-500',
-    },
-  ];
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    idNumber: '',
+    amount: '',
+    paymentMethod: 'M-Pesa',
+    message: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      setIsSubmitted(true);
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        idNumber: '',
+        amount: '',
+        paymentMethod: 'M-Pesa',
+        message: '',
+      });
+    } catch (error) {
+      console.error('Error submitting donation form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <AnimatedPage>
-      <div className="bg-gray-50 py-20">
-        <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl font-bold text-bright-blue-800">Support Our Mission</h1>
-          <p className="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">
-            Your contribution, no matter the size, makes a world of difference. Together, we can provide the tools and inspiration students need to build a brighter future for themselves and their community.
+      <section className="bg-gray-50 py-16 sm:py-20">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h1 className="text-3xl sm:text-4xl font-bold text-center text-bright-blue-800 mb-4">
+            Support Our Mission
+          </h1>
+
+          {/* 🌟 Encouraging Message */}
+          <p className="text-center max-w-2xl mx-auto text-gray-700 mb-8">
+            Your contribution goes a long way in transforming the future of young learners across Kenya.
+            Together, we can create opportunities, inspire hope, and build a brighter tomorrow through education.
+            Every shilling counts, and your support truly matters. 💙
           </p>
 
-          <div className="max-w-4xl mx-auto mt-12 bg-white p-8 md:p-12 rounded-xl shadow-2xl">
-            <h2 className="text-2xl font-bold text-bright-blue-700 mb-2">Track Our Collective Impact</h2>
-            <p className="text-gray-600 mb-8">See how donations like yours are making a difference in real-time.</p>
-            
-            <div className="space-y-6 mb-12 text-left">
-              {impactGoals.map((item, index) => (
-                <div key={index}>
-                  <div className="flex justify-between items-end mb-1">
-                    <span className="font-medium text-gray-700">{item.title}</span>
-                    <span className="text-sm font-bold text-bright-blue-700">{item.current} / {item.goal}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-                    <div
-                      className={`${item.color} h-4 rounded-full transition-all duration-1000 ease-out`}
-                      style={{ width: `${(item.current / item.goal) * 100}%` }}
-                    ></div>
-                  </div>
-                   <p className="text-xs text-gray-500 mt-1">{item.description}</p>
-                </div>
-              ))}
-            </div>
-            
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Your Contribution Matters</h3>
-            <div className="grid md:grid-cols-3 gap-6 text-center mb-10">
-                <div className="bg-bright-blue-50 p-4 rounded-lg flex flex-col justify-center">
-                    <p><span className="font-bold text-lg block text-bright-blue-800">Ksh 1,000</span> provides a term's supply of sanitary pads for two girls.</p>
-                </div>
-                <div className="bg-bright-blue-50 p-4 rounded-lg flex flex-col justify-center">
-                    <p><span className="font-bold text-lg block text-bright-blue-800">Ksh 2,500</span> supplies school materials for a student for one year.</p>
-                </div>
-                <div className="bg-bright-blue-50 p-4 rounded-lg flex flex-col justify-center">
-                    <p><span className="font-bold text-lg block text-bright-blue-800">Ksh 5,000</span> sponsors a student's participation in mentorship workshops.</p>
-                </div>
-            </div>
-
-            <h3 className="text-xl font-semibold text-gray-700 mb-4">Choose Your Payment Method</h3>
-            <div className="space-y-6">
-              {/* M-Pesa */}
-              <div className="border border-gray-200 p-6 rounded-lg">
-                <h4 className="font-bold text-lg text-green-600 mb-2">Send Money (M-Pesa)</h4>
-                <p>Send your donation directly to:</p>
-                <p className="font-mono text-xl bg-gray-100 p-2 rounded my-2 inline-block">0742180636</p>
-                <p className="text-sm mt-2 text-gray-500">Your support is greatly appreciated!</p>
+          {/* 💰 Donation Methods */}
+          <div className="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl mb-10">
+            <h2 className="text-2xl font-bold text-bright-blue-700 mb-4 text-center">
+              Ways to Donate
+            </h2>
+            <div className="space-y-4 text-center">
+              <div>
+                <p className="text-lg font-semibold text-gray-800">📱 M-Pesa (Send Money)</p>
+                <p className="text-xl font-bold text-bright-blue-700">+254 742 180636</p>
               </div>
-
-              {/* PayPal */}
-              <div className="border border-gray-200 p-6 rounded-lg">
-                <h4 className="font-bold text-lg text-blue-600 mb-2">PayPal</h4>
-                <p>Send your donation via PayPal to:</p>
-                 <p className="font-mono text-lg bg-gray-100 p-2 rounded my-2 inline-block">kevinmuli047@gmail.com</p>
-                <p className="text-sm mt-2 text-gray-500">You can use the button below for a direct link (placeholder).</p>
-                 <button className="w-full mt-4 bg-blue-800 text-white py-3 rounded-lg font-bold hover:bg-blue-900 transition">
-                  Donate via PayPal
-                </button>
+              <div>
+                <p className="text-lg font-semibold text-gray-800">💳 PayPal</p>
+                <p className="text-xl font-bold text-bright-blue-700">kevinmuli047@gmail.com</p>
               </div>
             </div>
           </div>
+
+          {/* 📝 Donation Form */}
+          <div className="max-w-2xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+            <h2 className="text-2xl font-bold text-bright-blue-700 mb-4 text-center">
+              Donation Form
+            </h2>
+
+            {isSubmitted ? (
+              <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded mb-6 text-center">
+                <p className="font-bold">Thank you for your generous support!</p>
+                <p>We have received your donation information and a confirmation email will be sent shortly.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="idNumber" className="block text-sm font-medium text-gray-700">ID Number</label>
+                  <input
+                    type="text"
+                    id="idNumber"
+                    name="idNumber"
+                    value={formData.idNumber}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Donation Amount (Ksh)</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700">Payment Method</label>
+                  <select
+                    id="paymentMethod"
+                    name="paymentMethod"
+                    value={formData.paymentMethod}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  >
+                    <option value="M-Pesa">M-Pesa</option>
+                    <option value="PayPal">PayPal</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message (Optional)</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={3}
+                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"
+                  ></textarea>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-bright-blue-600 text-white font-bold py-3 rounded-lg hover:bg-bright-blue-700 transition disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Donation Info'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
     </AnimatedPage>
   );
 };
