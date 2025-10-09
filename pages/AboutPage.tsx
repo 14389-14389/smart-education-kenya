@@ -20,14 +20,14 @@ const AboutPage: React.FC = () => {
           {/* Founders Section */}
           <div className="grid lg:grid-cols-2 gap-16 sm:gap-24 items-start">
             {/* Lucky Kitonyi */}
-            <div className="bg-white pt-20 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col items-center text-center relative">
+            <div className="bg-white pt-28 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col items-center text-center relative">
               <img
                 src="/assets/lucky kitonyi.jpg"
                 alt="Lucky Kitonyi, Founder"
-                className="rounded-full shadow-2xl w-32 h-32 sm:w-40 sm:h-40 object-cover border-8 border-white absolute -top-16 sm:-top-20"
+                className="rounded-full shadow-2xl w-32 h-32 sm:w-40 sm:h-40 object-cover border-8 border-white absolute -top-20 sm:-top-24"
                 loading="lazy"
               />
-              <h2 className="text-2xl sm:text-3xl font-bold text-bright-blue-700 mt-2 mb-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-bright-blue-700 mt-6 mb-1">
                 Lucky Kitonyi
               </h2>
               <p className="font-medium text-gray-500 mb-4">
@@ -47,14 +47,14 @@ const AboutPage: React.FC = () => {
             </div>
 
             {/* Kevin Muli */}
-            <div className="bg-white pt-20 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col items-center text-center relative">
+            <div className="bg-white pt-28 p-6 sm:p-8 rounded-lg shadow-lg flex flex-col items-center text-center relative">
               <img
                 src="/assets/kevinmuli1.jpg"
                 alt="Kevin Muli, Co-Founder"
-                className="rounded-full shadow-2xl w-32 h-32 sm:w-40 sm:h-40 object-cover border-8 border-white absolute -top-16 sm:-top-20"
+                className="rounded-full shadow-2xl w-32 h-32 sm:w-40 sm:h-40 object-cover border-8 border-white absolute -top-20 sm:-top-24"
                 loading="lazy"
               />
-              <h2 className="text-2xl sm:text-3xl font-bold text-bright-blue-700 mt-2 mb-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-bright-blue-700 mt-6 mb-1">
                 Kevin Muli
               </h2>
               <p className="font-medium text-gray-500 mb-4">
