@@ -71,35 +71,35 @@ export const PROGRAMS_DATA = [
 ];
 
 export const GALLERY_IMAGES = [
-    { id: 1, src: '/assets/gallery-1.jpg', alt: 'Students in a mentorship session' },
-    { id: 2, src: '/assets/gallery-2.jpg', alt: 'Award ceremony for top-performing students' },
-    { id: 3, src: '/assets/gallery-3.jpg', alt: 'Distribution of sanitary pads for the Girls\' Dignity Project' },
-    { id: 4, src: '/assets/gallery-4.jpg', alt: 'A student receiving scholarship assistance guidance' },
-    { id: 5, src: '/assets/gallery-5.jpg', alt: 'Community members at a Smart Education event' },
-    { id: 6, src: '/assets/gallery-6.jpg', alt: 'Volunteers engaging with students' },
-    { id: 7, src: '/assets/gallery-7.jpg', alt: 'Lucky Kitonyi speaking to students' },
-    { id: 8, src: '/assets/gallery-8.jpg', alt: 'A group of smiling students with new school supplies' },
+    { id: 1, src: '/assets/kyeni5.jpg', alt: 'Students in a mentorship session' },
+    { id: 2, src: '/assets/kyeni4.jpg', alt: 'Award ceremony for top-performing students' },
+    { id: 3, src: '/assets/kyeni2.jpg', alt: 'Distribution of sanitary pads for the Girls\' Dignity Project' },
+    { id: 4, src: '/assets/kyeni3.jpg', alt: 'A student receiving scholarship assistance guidance' },
+    { id: 5, src: '/assets/kyeni2.jpg', alt: 'Community members at a Smart Education event' },
+    { id: 6, src: '/assets/kyeni6.jpg', alt: 'Volunteers engaging with students' },
+    { id: 7, src: '/assets/kyeni6.jpg', alt: 'Lucky Kitonyi speaking to students' },
+    { id: 8, src: '/assets/kyeni6.jpg', alt: 'A group of smiling students with new school supplies' },
 ];
 
 export const BLOG_POSTS = [
     {
         id: 1,
         title: 'The Ripple Effect: How Mentorship Transforms a Community',
-        image: '/assets/How Mentorship Transforms a Community.png',
+        image: '/assets/kyeni5.jpg',
         date: 'October 26, 2024',
         excerpt: 'Mentorship is more than just guidance; it\'s a transformative force that creates a ripple effect of positive change. When one student is empowered, they inspire their peers, uplift their families, and eventually, contribute to a stronger, more resilient community. This post explores the profound, long-term impact of our mentorship programs.'
     },
     {
         id: 2,
         title: 'Education as the Great Equalizer in Rural Kenya',
-        image: '/assets/Education as the Great Equalizer in Rural Kenya.png',
+        image: '/assets/kyeni4.jpg',
         date: 'October 15, 2024',
         excerpt: 'In many parts of Kenya, the gap between potential and opportunity is vast. Education stands as the single most powerful tool to bridge this divide. We delve into why investing in the education of rural youth is not just a local issue, but a critical step towards building a more equitable and prosperous nation for all.'
     },
     {
         id: 3,
         title: 'Why Keeping Girls in School is a National Priority',
-        image: '/assets/Keeping Girls in School.png',
+        image: '/assets/kyeni6.jpg',
         date: 'September 30, 2024',
         excerpt: 'When a girl is educated, she is more likely to earn a higher income, have a healthier family, and invest back into her community. Our Girls\' Dignity Project tackles one of the biggest barriers to female education. Learn why this simple intervention is a game-changer for girls and for Kenya at large.'
     }
