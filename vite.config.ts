@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => {
         includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
         manifest: {
           name: 'Smart Education Kenya',
-          short_name: 'SmartEdu',
+          short_name: 'SmartEducation',
           description:
             'Empowering students through mentorship, education, and scholarships.',
           theme_color: '#ffffff',
