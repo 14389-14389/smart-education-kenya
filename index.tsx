@@ -1,8 +1,14 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { HashRouter } from 'react-router-dom';
+import { registerSW } from 'virtual:pwa-register'; // <-- Added for PWA
+
+// Register the service worker (auto update mode)
+registerSW({
+  onNeedRefresh() {},
+  onOfflineReady() {},
+});
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
