@@ -79,6 +79,7 @@ export const PROGRAMS_DATA = [
 ];
 
 export const GALLERY_IMAGES = [
+  // Keep original flat images
   {
     id: 1,
     src: '/assets/kyeni5.jpg',
@@ -118,6 +119,38 @@ export const GALLERY_IMAGES = [
     id: 8,
     src: '/assets/kyeni6.jpg',
     alt: 'A cheerful group of students posing with new learning materials provided by Smart Education.',
+  },
+
+  // New structured gallery grouped by school
+  {
+    schoolGroups: [
+      {
+        school: "Ikalaasa juniour secondary",
+        photos: [
+          { src: '/assets/c1 (1).jpg', alt: 'Students in classroom' },
+          { src: '/assets/c1 (4).jpg', alt: 'School playground' },
+          { src: '/assets/c1 (12).jpg', alt: 'School playground' },
+          { src: '/assets/c1 (19).jpg', alt: 'School playground' },
+          
+        ],
+      },
+      {
+        school: "Kyeni primary school",
+        photos: [
+          { src: '/assets/c1 (14).jpg', alt: 'Science lab session' },
+          { src: '/assets/c1 (22).jpg', alt: 'Library' },
+          { src: '/assets/c1 (16).jpg', alt: 'Library' },
+        ],
+      },
+       {
+        school: "Mwangoni primary school",
+        photos: [
+          { src: '/assets/c1 (17).jpg', alt: 'Science lab session' },
+          { src: '/assets/c1 (18).jpg', alt: 'Library' },
+          { src: '/assets/c1 (19).jpg', alt: 'Library' },
+        ],
+      },
+    ],
   },
 ];
 

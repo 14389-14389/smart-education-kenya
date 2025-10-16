@@ -1,40 +1,79 @@
-import React from 'react';
-import AnimatedPage from '../components/AnimatedPage';
+import React, { useState } from 'react';
 import { GALLERY_IMAGES } from '../constants';
 
-const GalleryPage: React.FC = () => {
-  return (
-    <AnimatedPage>
-      <section className="p-6 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
-          Our Gallery
-        </h1>
-        <p className="text-center text-gray-600 mb-8">
-          Explore special moments from our learning sessions, mentorship programs, and empowerment activities that uplift and inspire communities.
-        </p>
+const Gallery: React.FC = () => {
+  // Check if we have schoolGroups
+  const schoolGroups = GALLERY_IMAGES.find(img => (img as any).schoolGroups)?.schoolGroups || [];
+  
+  const [activeSchoolIndex, setActiveSchoolIndex] = useState(0);
 
-        {/* Image Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {GALLERY_IMAGES.map((img, index) => (
-            <div
-              key={index}
-              className="relative group overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-shadow"
+  // Function to render flat images (for backward compatibility)
+  const renderFlatImages = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {GALLERY_IMAGES.map((img) => {
+        if ((img as any).schoolGroups) return null; // skip schoolGroups here
+        return (
+          <div key={(img as any).id} className="overflow-hidden rounded-lg shadow-lg">
+            <img
+              src={(img as any).src}
+              alt={(img as any).alt}
+              className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // Function to render grouped images
+  const renderGroupedImages = () => {
+    if (!schoolGroups.length) return null;
+
+    const activeSchool = schoolGroups[activeSchoolIndex];
+
+    return (
+      <div>
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6 flex-wrap justify-center">
+          {schoolGroups.map((group, index) => (
+            <button
+              key={group.school}
+              onClick={() => setActiveSchoolIndex(index)}
+              className={`px-4 py-2 rounded-full font-semibold ${
+                index === activeSchoolIndex
+                  ? 'bg-bright-blue-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
             >
+              {group.school}
+            </button>
+          ))}
+        </div>
+
+        {/* Images */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {activeSchool.photos.map((photo) => (
+            <div key={photo.src} className="overflow-hidden rounded-lg shadow-lg">
               <img
-                src={img.src}
-                alt={img.alt}
-                className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-500"
+                src={photo.src}
+                alt={photo.alt}
+                className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
               />
-              {/* Hover Description Overlay */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-center p-4 text-sm">
-                {img.description}
-              </div>
             </div>
           ))}
         </div>
-      </section>
-    </AnimatedPage>
+      </div>
+    );
+  };
+
+  return (
+    <div className="container mx-auto px-6 py-16">
+      <h1 className="text-4xl font-bold text-center text-bright-blue-800 mb-10">Gallery</h1>
+
+      {/* Render grouped first if available */}
+      {schoolGroups.length ? renderGroupedImages() : renderFlatImages()}
+    </div>
   );
 };
 
-export default GalleryPage;
+export default Gallery;
