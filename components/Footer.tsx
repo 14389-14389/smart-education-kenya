@@ -25,8 +25,8 @@ const Footer: React.FC = () => {
             <h3 className="font-bold text-lg mb-2">Get in Touch</h3>
             <ul className="text-sm text-bright-blue-200 space-y-1">
               <li>
-                <a href="mailto:starletlucky71@gmail.com" className="hover:text-white transition">
-                  starletlucky71@gmail.com
+                <a href="mailto: empowerthem01@gmail.com" className="hover:text-white transition">
+                   empowerthem01@gmail.com
                 </a>
               </li>
               <li>
