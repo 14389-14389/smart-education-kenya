@@ -79,7 +79,7 @@ export const PROGRAMS_DATA = [
 ];
 
 export const GALLERY_IMAGES = [
-  // Keep original flat images
+  // Original flat images
   {
     id: 1,
     src: '/assets/kyeni5.jpg',
@@ -121,33 +121,32 @@ export const GALLERY_IMAGES = [
     alt: 'A cheerful group of students posing with new learning materials provided by Smart Education.',
   },
 
-  // New structured gallery grouped by school
+  // Structured school groups with dateTaken, shortDescription, and otherInfo
   {
     schoolGroups: [
       {
-        school: "Ikalaasa juniour secondary",
+        school: "Ikalaasa Juniour Secondary",
         photos: [
-          { src: '/assets/c1 (1).jpg', alt: 'Students in classroom' },
-          { src: '/assets/c1 (4).jpg', alt: 'School playground' },
-          { src: '/assets/c1 (12).jpg', alt: 'School playground' },
-          { src: '/assets/c1 (19).jpg', alt: 'School playground' },
-          
+          { src: '/assets/c1 (1).jpg', alt: 'Students in classroom', shortDescription: 'Morning session in classroom', dateTaken: 'Jan 12, 2024', otherInfo: 'Mentorship program' },
+          { src: '/assets/c1 (4).jpg', alt: 'School playground', shortDescription: 'Students during break', dateTaken: 'Jan 12, 2024', otherInfo: 'Outdoor activity' },
+          { src: '/assets/c1 (12).jpg', alt: 'Library', shortDescription: 'Reading session', dateTaken: 'Jan 13, 2024', otherInfo: 'Library interaction' },
+          { src: '/assets/c1 (19).jpg', alt: 'Science lab', shortDescription: 'Practical experiment', dateTaken: 'Jan 14, 2024', otherInfo: 'Science class' },
         ],
       },
       {
-        school: "Kyeni primary school",
+        school: "Kyeni Primary School",
         photos: [
-          { src: '/assets/c1 (14).jpg', alt: 'Science lab session' },
-          { src: '/assets/c1 (22).jpg', alt: 'Library' },
-          { src: '/assets/c1 (16).jpg', alt: 'Library' },
+          { src: '/assets/c1 (14).jpg', alt: 'Science lab session', shortDescription: 'Students in science lab', dateTaken: 'Feb 10, 2024', otherInfo: 'Practical experiments' },
+          { src: '/assets/c1 (22).jpg', alt: 'Library', shortDescription: 'Library reading', dateTaken: 'Feb 11, 2024', otherInfo: 'Mentorship session' },
+          { src: '/assets/c1 (16).jpg', alt: 'Outdoor activity', shortDescription: 'Sports day', dateTaken: 'Feb 12, 2024', otherInfo: 'School event' },
         ],
       },
-       {
-        school: "Mwangoni primary school",
+      {
+        school: "Mwangoni Primary School",
         photos: [
-          { src: '/assets/c1 (17).jpg', alt: 'Science lab session' },
-          { src: '/assets/c1 (18).jpg', alt: 'Library' },
-          { src: '/assets/c1 (19).jpg', alt: 'Library' },
+          { src: '/assets/c1 (17).jpg', alt: 'Science lab session', shortDescription: 'Lab activity', dateTaken: 'Mar 5, 2024', otherInfo: 'Hands-on learning' },
+          { src: '/assets/c1 (18).jpg', alt: 'Library', shortDescription: 'Library time', dateTaken: 'Mar 6, 2024', otherInfo: 'Reading program' },
+          { src: '/assets/c1 (19).jpg', alt: 'Outdoor', shortDescription: 'Sports and games', dateTaken: 'Mar 7, 2024', otherInfo: 'PE session' },
         ],
       },
     ],

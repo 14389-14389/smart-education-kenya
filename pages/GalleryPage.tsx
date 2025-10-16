@@ -19,6 +19,9 @@ const Gallery: React.FC = () => {
               alt={(img as any).alt}
               className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
             />
+            <p className="mt-2 text-gray-700 text-sm">{(img as any).shortDescription}</p>
+            <p className="text-gray-400 text-xs">{(img as any).dateTaken}</p>
+            {(img as any).otherInfo && <p className="text-gray-400 text-xs">{(img as any).otherInfo}</p>}
           </div>
         );
       })}
@@ -59,6 +62,9 @@ const Gallery: React.FC = () => {
                 alt={photo.alt}
                 className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
               />
+              <p className="mt-2 text-gray-700 text-sm">{photo.shortDescription}</p>
+              <p className="text-gray-400 text-xs">{photo.dateTaken}</p>
+              {photo.otherInfo && <p className="text-gray-400 text-xs">{photo.otherInfo}</p>}
             </div>
           ))}
         </div>
