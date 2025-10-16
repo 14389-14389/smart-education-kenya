@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import AnimatedPage from '../components/AnimatedPage';
 
 // ✅ Google Apps Script Web App URLs
-const VOLUNTEER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLzMq9JFYGR9x3Kq_Ee4veq9pNOtRWD2vGekgZ2j8Ew1r0EOao6dk-58lvlvj3cPD-/exec';
-const PARTNER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbznPakUuZxJ7gn72qmseMH7y35LxrxjH0cTgB0ZiE0jrfQHyPjeJWeznRkPXZVpQzh6/exec';
+const VOLUNTEER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrUdLqpOtK2ieKv60JakSa00cgWaYzRAn9DvWLSSm5mtDBU3IdLFP5e5ZgCRRbjG8R/exec';
+const PARTNER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlRNf35BOzLwVY6AiGzkYYM13xqeQvQw-AxxxT0UCiVRL1fM3j9MHNM6ScGoBg7E3I/exec';
 
 const GetInvolvedPage: React.FC = () => {
   const [showVolunteerForm, setShowVolunteerForm] = useState(false);
@@ -82,11 +82,9 @@ const GetInvolvedPage: React.FC = () => {
     <AnimatedPage>
       <div className="py-20 bg-gray-50 min-h-screen">
         <div className="container mx-auto px-6 max-w-3xl">
-          <h1 className="text-4xl font-bold text-center text-bright-blue-800 mb-6">
-            Get Involved
-          </h1>
+          <h1 className="text-4xl font-bold text-center text-bright-blue-800 mb-6">Get Involved</h1>
 
-          {/* ✨ Motivational Section */}
+          {/* Motivational Section */}
           <div className="text-center mb-10">
             <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
               🌟 <strong>Your time, voice, and partnership can spark a brighter future for thousands of young learners.</strong><br />
@@ -97,7 +95,7 @@ const GetInvolvedPage: React.FC = () => {
             </p>
           </div>
 
-          {/* BUTTONS SECTION */}
+          {/* Buttons */}
           <div className="flex flex-col md:flex-row gap-6 justify-center mb-10">
             <button
               onClick={() => {
@@ -120,7 +118,7 @@ const GetInvolvedPage: React.FC = () => {
             </button>
           </div>
 
-          {/* VOLUNTEER FORM */}
+          {/* Volunteer Form */}
           {showVolunteerForm && (
             <div className="bg-white p-8 rounded-xl shadow-lg mb-12 transition-all duration-500">
               <h2 className="text-2xl font-bold text-bright-blue-700 mb-4 text-center">Volunteer Sign-Up</h2>
@@ -143,7 +141,7 @@ const GetInvolvedPage: React.FC = () => {
             </div>
           )}
 
-          {/* PARTNER FORM */}
+          {/* Partner Form */}
           {showPartnerForm && (
             <div className="bg-white p-8 rounded-xl shadow-lg transition-all duration-500">
               <h2 className="text-2xl font-bold text-yellow-600 mb-4 text-center">Partner With Us</h2>
