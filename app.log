@@ -128,3 +128,19 @@
 2025-10-28 00:01:25,513 INFO: 127.0.0.1 - - [28/Oct/2025 00:01:25] "[35m[1mGET /api/view/partner HTTP/1.1[0m" 500 -
 2025-10-28 00:01:25,516 ERROR: Error retrieving data: ac-ewkew2n-shard-00-00.a3nfpmv.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-ewkew2n-shard-00-02.a3nfpmv.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-ewkew2n-shard-00-01.a3nfpmv.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68ffcfa5f12bbcf6a7c9c343, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-ewkew2n-shard-00-00.a3nfpmv.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-ewkew2n-shard-00-00.a3nfpmv.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ewkew2n-shard-00-01.a3nfpmv.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-ewkew2n-shard-00-01.a3nfpmv.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-ewkew2n-shard-00-02.a3nfpmv.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-ewkew2n-shard-00-02.a3nfpmv.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
 2025-10-28 00:01:25,518 INFO: 127.0.0.1 - - [28/Oct/2025 00:01:25] "[35m[1mGET /api/view/volunteer HTTP/1.1[0m" 500 -
+2025-10-28 00:04:30,022 INFO: 127.0.0.1 - - [28/Oct/2025 00:04:30] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-28 00:04:30,866 INFO: 127.0.0.1 - - [28/Oct/2025 00:04:30] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-28 00:04:35,279 INFO: 127.0.0.1 - - [28/Oct/2025 00:04:35] "OPTIONS /api/volunteer HTTP/1.1" 200 -
+2025-10-28 00:04:35,521 INFO: Volunteer added with ID: 68ffde63f12bbcf6a7c9c345
+2025-10-28 00:04:35,522 INFO: 127.0.0.1 - - [28/Oct/2025 00:04:35] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
+2025-10-28 00:04:37,257 INFO: 127.0.0.1 - - [28/Oct/2025 00:04:37] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-28 00:05:01,889 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:01] "OPTIONS /api/volunteer HTTP/1.1" 200 -
+2025-10-28 00:05:02,592 INFO: Volunteer added with ID: 68ffde7df12bbcf6a7c9c346
+2025-10-28 00:05:02,595 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:02] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
+2025-10-28 00:05:25,539 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:25] "OPTIONS /api/partner HTTP/1.1" 200 -
+2025-10-28 00:05:25,732 INFO: Partner added with ID: 68ffde95f12bbcf6a7c9c347
+2025-10-28 00:05:25,733 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:25] "[35m[1mPOST /api/partner HTTP/1.1[0m" 201 -
+2025-10-28 00:05:37,674 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:37] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-28 00:05:37,678 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:37] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-28 00:09:36,706 INFO: 127.0.0.1 - - [28/Oct/2025 00:09:36] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-28 00:09:36,707 INFO: 127.0.0.1 - - [28/Oct/2025 00:09:36] "GET /api/view/volunteer HTTP/1.1" 200 -
