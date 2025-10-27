@@ -6,6 +6,7 @@ export const NAV_LINKS = [
   { href: '/blog', label: 'Blog' },
   { href: '/get-involved', label: 'Get Involved' },
   { href: '/contact', label: 'Contact' },
+  { href: '/admin', label: 'Admin Dashboard' }, // ✅ Added Admin link
   { href: '/donate', label: 'Donate' },
 ];
 
@@ -14,6 +15,7 @@ export const SOCIAL_LINKS = {
   twitter: 'https://twitter.com/smarteducation',
   facebook: 'https://facebook.com/smarteducation',
 };
+
 
 export const PROGRAMS_DATA = [
   {

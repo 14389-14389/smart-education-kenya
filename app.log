@@ -1,0 +1,108 @@
+2025-10-27 20:21:45,760 ERROR: \u274c MongoDB Connection Error: The DNS query name does not exist: _mongodb._tcp.cluster0.mongodb.net.
+2025-10-27 20:32:26,386 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:32:27,907 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-10-27 20:32:27,908 INFO: [33mPress CTRL+C to quit[0m
+2025-10-27 20:32:27,921 INFO:  * Restarting with stat
+2025-10-27 20:32:29,474 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:32:29,526 WARNING:  * Debugger is active!
+2025-10-27 20:32:29,534 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 20:33:01,228 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:33:02,544 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-10-27 20:33:02,545 INFO: [33mPress CTRL+C to quit[0m
+2025-10-27 20:33:02,548 INFO:  * Restarting with stat
+2025-10-27 20:33:03,568 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:33:03,600 WARNING:  * Debugger is active!
+2025-10-27 20:33:03,604 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 20:35:14,786 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:35:16,104 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-10-27 20:35:16,104 INFO: [33mPress CTRL+C to quit[0m
+2025-10-27 20:35:16,108 INFO:  * Restarting with stat
+2025-10-27 20:35:17,096 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:35:17,128 WARNING:  * Debugger is active!
+2025-10-27 20:35:17,131 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 20:37:17,791 INFO: 127.0.0.1 - - [27/Oct/2025 20:37:17] "GET / HTTP/1.1" 200 -
+2025-10-27 20:37:17,949 INFO: 127.0.0.1 - - [27/Oct/2025 20:37:17] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-27 20:52:44,174 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:52:45,469 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-10-27 20:52:45,470 INFO: [33mPress CTRL+C to quit[0m
+2025-10-27 20:52:45,471 INFO:  * Restarting with stat
+2025-10-27 20:52:46,283 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:52:46,313 WARNING:  * Debugger is active!
+2025-10-27 20:52:46,316 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 20:56:21,868 INFO: 127.0.0.1 - - [27/Oct/2025 20:56:21] "[33mOPTIONS /volunteer HTTP/1.1[0m" 404 -
+2025-10-27 20:56:42,750 INFO: 127.0.0.1 - - [27/Oct/2025 20:56:42] "[33mOPTIONS /partner HTTP/1.1[0m" 404 -
+2025-10-27 20:58:31,020 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\app.py', reloading
+2025-10-27 20:58:31,654 INFO:  * Restarting with stat
+2025-10-27 20:58:32,927 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:58:32,961 WARNING:  * Debugger is active!
+2025-10-27 20:58:32,964 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 20:58:50,221 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:58:51,555 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-10-27 20:58:51,555 INFO: [33mPress CTRL+C to quit[0m
+2025-10-27 20:58:51,557 INFO:  * Restarting with stat
+2025-10-27 20:58:52,429 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 20:58:52,459 WARNING:  * Debugger is active!
+2025-10-27 20:58:52,464 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 20:59:12,411 INFO: 127.0.0.1 - - [27/Oct/2025 20:59:12] "GET / HTTP/1.1" 200 -
+2025-10-27 20:59:13,228 INFO: 127.0.0.1 - - [27/Oct/2025 20:59:13] "GET / HTTP/1.1" 200 -
+2025-10-27 20:59:13,394 INFO: 127.0.0.1 - - [27/Oct/2025 20:59:13] "GET / HTTP/1.1" 200 -
+2025-10-27 20:59:13,581 INFO: 127.0.0.1 - - [27/Oct/2025 20:59:13] "GET / HTTP/1.1" 200 -
+2025-10-27 20:59:13,759 INFO: 127.0.0.1 - - [27/Oct/2025 20:59:13] "GET / HTTP/1.1" 200 -
+2025-10-27 21:00:19,202 INFO: Volunteer added with ID: 68ffb3313ee4f50ae324bdd8
+2025-10-27 21:00:19,204 INFO: 127.0.0.1 - - [27/Oct/2025 21:00:19] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
+2025-10-27 21:04:04,862 INFO: 127.0.0.1 - - [27/Oct/2025 21:04:04] "[31m[1mGET /api/volunteer HTTP/1.1[0m" 405 -
+2025-10-27 21:05:23,838 INFO: 127.0.0.1 - - [27/Oct/2025 21:05:23] "OPTIONS /api/volunteer HTTP/1.1" 200 -
+2025-10-27 21:05:24,028 INFO: Volunteer added with ID: 68ffb4633ee4f50ae324bdd9
+2025-10-27 21:05:24,029 INFO: 127.0.0.1 - - [27/Oct/2025 21:05:24] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
+2025-10-27 21:06:24,472 INFO: 127.0.0.1 - - [27/Oct/2025 21:06:24] "OPTIONS /api/partner HTTP/1.1" 200 -
+2025-10-27 21:06:24,683 INFO: Partner added with ID: 68ffb4a03ee4f50ae324bdda
+2025-10-27 21:06:24,683 INFO: 127.0.0.1 - - [27/Oct/2025 21:06:24] "[35m[1mPOST /api/partner HTTP/1.1[0m" 201 -
+2025-10-27 22:13:10,812 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 22:13:12,139 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-10-27 22:13:12,139 INFO: [33mPress CTRL+C to quit[0m
+2025-10-27 22:13:12,143 INFO:  * Restarting with stat
+2025-10-27 22:13:13,129 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 22:13:13,159 WARNING:  * Debugger is active!
+2025-10-27 22:13:13,162 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 22:44:31,733 INFO: 127.0.0.1 - - [27/Oct/2025 22:44:31] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-27 22:44:31,736 INFO: 127.0.0.1 - - [27/Oct/2025 22:44:31] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-27 22:55:26,016 INFO: 127.0.0.1 - - [27/Oct/2025 22:55:26] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-27 22:55:26,018 INFO: 127.0.0.1 - - [27/Oct/2025 22:55:26] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-27 22:55:30,288 INFO: 127.0.0.1 - - [27/Oct/2025 22:55:30] "[33mOPTIONS /api/update/volunteer/kevin@example.com HTTP/1.1[0m" 404 -
+2025-10-27 22:55:37,911 INFO: 127.0.0.1 - - [27/Oct/2025 22:55:37] "[33mOPTIONS /api/delete/volunteer/kevin@example.com HTTP/1.1[0m" 404 -
+2025-10-27 22:55:43,049 INFO: 127.0.0.1 - - [27/Oct/2025 22:55:43] "[33mOPTIONS /api/delete/volunteer/kevin@example.com HTTP/1.1[0m" 404 -
+2025-10-27 23:01:39,883 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\app.py', reloading
+2025-10-27 23:01:39,909 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\app.py', reloading
+2025-10-27 23:01:40,534 INFO:  * Restarting with stat
+2025-10-27 23:01:40,579 INFO:  * Restarting with stat
+2025-10-27 23:01:42,170 INFO: \u2705 Connected to MongoDB successfully
+2025-10-27 23:01:42,208 WARNING:  * Debugger is active!
+2025-10-27 23:01:42,209 WARNING:  * Debugger is active!
+2025-10-27 23:01:42,214 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 23:01:42,214 INFO:  * Debugger PIN: 900-189-527
+2025-10-27 23:01:47,672 INFO: 127.0.0.1 - - [27/Oct/2025 23:01:47] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-27 23:01:48,540 INFO: 127.0.0.1 - - [27/Oct/2025 23:01:48] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-27 23:01:51,270 INFO: 127.0.0.1 - - [27/Oct/2025 23:01:51] "OPTIONS /api/update/volunteer/kevin@example.com HTTP/1.1" 200 -
+2025-10-27 23:01:51,445 INFO: Updated volunteer with email: kevin@example.com
+2025-10-27 23:01:51,449 INFO: 127.0.0.1 - - [27/Oct/2025 23:01:51] "PUT /api/update/volunteer/kevin@example.com HTTP/1.1" 200 -
+2025-10-27 23:01:55,106 INFO: 127.0.0.1 - - [27/Oct/2025 23:01:55] "OPTIONS /api/delete/volunteer/kevin@example.com HTTP/1.1" 200 -
+2025-10-27 23:01:56,315 INFO: Deleted volunteer with email: kevin@example.com
+2025-10-27 23:01:56,315 INFO: 127.0.0.1 - - [27/Oct/2025 23:01:56] "DELETE /api/delete/volunteer/kevin@example.com HTTP/1.1" 200 -

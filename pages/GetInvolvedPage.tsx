@@ -1,172 +1,282 @@
-import React, { useState } from 'react';
-import AnimatedPage from '../components/AnimatedPage';
-
-// ✅ Google Apps Script Web App URLs
-const VOLUNTEER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyrUdLqpOtK2ieKv60JakSa00cgWaYzRAn9DvWLSSm5mtDBU3IdLFP5e5ZgCRRbjG8R/exec';
-const PARTNER_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlRNf35BOzLwVY6AiGzkYYM13xqeQvQw-AxxxT0UCiVRL1fM3j9MHNM6ScGoBg7E3I/exec';
+import React, { useState } from "react";
 
 const GetInvolvedPage: React.FC = () => {
-  const [showVolunteerForm, setShowVolunteerForm] = useState(false);
-  const [showPartnerForm, setShowPartnerForm] = useState(false);
+  // ✅ Google Apps Script URLs
+  // ✅ Google Apps Script URLs
+const VOLUNTEER_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbyrUdLqpOtK2ieKv60JakSa00cgWaYzRAn9DvWLSSm5mtDBU3IdLFP5e5ZgCRRbjG8R/exec";
+const PARTNER_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbwlRNf35BOzLwVY6AiGzkYYM13xqeQvQw-AxxxT0UCiVRL1fM3j9MHNM6ScGoBg7E3I/exec";
 
+// ✅ Flask + MongoDB URLs
+const VOLUNTEER_API_URL = "http://127.0.0.1:5000/api/volunteer";
+const PARTNER_API_URL = "http://127.0.0.1:5000/api/partner";
+
+
+  // ✅ State for volunteer form
   const [volunteerData, setVolunteerData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    interest: '',
-    message: '',
+    fullName: "",
+    email: "",
+    phone: "",
+    interest: "",
+    message: "",
   });
 
+  // ✅ State for partner form
   const [partnerData, setPartnerData] = useState({
-    organization: '',
-    contactPerson: '',
-    email: '',
-    phone: '',
-    partnershipType: '',
-    message: '',
+    organization: "",
+    contactPerson: "",
+    email: "",
+    phone: "",
+    partnershipType: "",
+    message: "",
   });
 
+  // ✅ Control state
+  const [loading, setLoading] = useState(false);
   const [volunteerSubmitted, setVolunteerSubmitted] = useState(false);
   const [partnerSubmitted, setPartnerSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleVolunteerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setVolunteerData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handlePartnerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setPartnerData((prev) => ({ ...prev, [name]: value }));
-  };
-
+  // ---------------- VOLUNTEER FORM HANDLER ----------------
   const submitVolunteer = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await fetch(VOLUNTEER_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+      // Send to Flask + MongoDB
+      const mongoResponse = fetch(VOLUNTEER_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(volunteerData),
       });
+
+      // Send to Google Sheets
+      const googleResponse = fetch(VOLUNTEER_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(volunteerData),
+      });
+
+      // Wait for both to finish
+      await Promise.all([mongoResponse, googleResponse]);
+
       setVolunteerSubmitted(true);
-      setVolunteerData({ fullName: '', email: '', phone: '', interest: '', message: '' });
+      alert("✅ Volunteer submission sent to MongoDB + Google Sheets!");
+      setVolunteerData({
+        fullName: "",
+        email: "",
+        phone: "",
+        interest: "",
+        message: "",
+      });
     } catch (error) {
-      console.error('Volunteer submission failed:', error);
-      alert('Failed to submit volunteer form. Please try again.');
+      console.error("Volunteer submission failed:", error);
+      alert("❌ Failed to submit volunteer form. Try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  // ---------------- PARTNER FORM HANDLER ----------------
   const submitPartner = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await fetch(PARTNER_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+      // Send to Flask + MongoDB
+      const mongoResponse = fetch(PARTNER_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(partnerData),
       });
+
+      // Send to Google Sheets
+      const googleResponse = fetch(PARTNER_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(partnerData),
+      });
+
+      // Wait for both to finish
+      await Promise.all([mongoResponse, googleResponse]);
+
       setPartnerSubmitted(true);
-      setPartnerData({ organization: '', contactPerson: '', email: '', phone: '', partnershipType: '', message: '' });
+      alert("✅ Partner submission sent to MongoDB + Google Sheets!");
+      setPartnerData({
+        organization: "",
+        contactPerson: "",
+        email: "",
+        phone: "",
+        partnershipType: "",
+        message: "",
+      });
     } catch (error) {
-      console.error('Partner submission failed:', error);
-      alert('Failed to submit partner form. Please try again.');
+      console.error("Partner submission failed:", error);
+      alert("❌ Failed to submit partner form. Try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  // ---------------- JSX RETURN ----------------
   return (
-    <AnimatedPage>
-      <div className="py-20 bg-gray-50 min-h-screen">
-        <div className="container mx-auto px-6 max-w-3xl">
-          <h1 className="text-4xl font-bold text-center text-bright-blue-800 mb-6">Get Involved</h1>
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="text-4xl font-bold text-center mb-8">
+        Get Involved with JuaHustle
+      </h1>
+      <p className="text-center mb-10 text-lg">
+        Join us as a volunteer or partner and make an impact in your community.
+      </p>
 
-          {/* Motivational Section */}
-          <div className="text-center mb-10">
-            <p className="text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-              🌟 <strong>Your time, voice, and partnership can spark a brighter future for thousands of young learners.</strong><br />
-              Whether you choose to volunteer or collaborate with us, your involvement goes far beyond today — it plants seeds of hope, opportunity, and lasting change.
-            </p>
-            <p className="mt-4 text-gray-600 italic">
-              Join our mission to empower the next generation. <strong>Be the reason a dream comes true.</strong>
-            </p>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex flex-col md:flex-row gap-6 justify-center mb-10">
-            <button
-              onClick={() => {
-                setShowVolunteerForm(!showVolunteerForm);
-                setShowPartnerForm(false);
-              }}
-              className="flex-1 bg-bright-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-bright-blue-700 transition"
-            >
-              Volunteer With Us
-            </button>
-
-            <button
-              onClick={() => {
-                setShowPartnerForm(!showPartnerForm);
-                setShowVolunteerForm(false);
-              }}
-              className="flex-1 bg-yellow-500 text-white py-4 rounded-lg font-bold text-lg hover:bg-yellow-600 transition"
-            >
-              Partner With Us
-            </button>
-          </div>
-
-          {/* Volunteer Form */}
-          {showVolunteerForm && (
-            <div className="bg-white p-8 rounded-xl shadow-lg mb-12 transition-all duration-500">
-              <h2 className="text-2xl font-bold text-bright-blue-700 mb-4 text-center">Volunteer Sign-Up</h2>
-              {volunteerSubmitted ? (
-                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded text-center">
-                  ✅ Thank you for signing up to volunteer! We'll be in touch soon.
-                </div>
-              ) : (
-                <form onSubmit={submitVolunteer} className="space-y-4">
-                  <input name="fullName" placeholder="Full Name" value={volunteerData.fullName} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
-                  <input name="email" type="email" placeholder="Email" value={volunteerData.email} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
-                  <input name="phone" placeholder="Phone Number" value={volunteerData.phone} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
-                  <input name="interest" placeholder="Area of Interest (e.g. Mentoring, Events)" value={volunteerData.interest} onChange={handleVolunteerChange} required className="w-full border rounded p-2" />
-                  <textarea name="message" placeholder="Message (Optional)" value={volunteerData.message} onChange={handleVolunteerChange} rows={3} className="w-full border rounded p-2"></textarea>
-                  <button type="submit" disabled={loading} className="w-full bg-bright-blue-600 text-white py-2 rounded-lg font-bold hover:bg-bright-blue-700 transition">
-                    {loading ? 'Submitting...' : 'Submit'}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-
-          {/* Partner Form */}
-          {showPartnerForm && (
-            <div className="bg-white p-8 rounded-xl shadow-lg transition-all duration-500">
-              <h2 className="text-2xl font-bold text-yellow-600 mb-4 text-center">Partner With Us</h2>
-              {partnerSubmitted ? (
-                <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded text-center">
-                  ✅ Thank you for your interest in partnering with us. We will reach out shortly.
-                </div>
-              ) : (
-                <form onSubmit={submitPartner} className="space-y-4">
-                  <input name="organization" placeholder="Organization / Name" value={partnerData.organization} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
-                  <input name="contactPerson" placeholder="Contact Person" value={partnerData.contactPerson} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
-                  <input name="email" type="email" placeholder="Email" value={partnerData.email} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
-                  <input name="phone" placeholder="Phone Number" value={partnerData.phone} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
-                  <input name="partnershipType" placeholder="Type of Partnership (e.g. CSR, Sponsorship)" value={partnerData.partnershipType} onChange={handlePartnerChange} required className="w-full border rounded p-2" />
-                  <textarea name="message" placeholder="Message (Optional)" value={partnerData.message} onChange={handlePartnerChange} rows={3} className="w-full border rounded p-2"></textarea>
-                  <button type="submit" disabled={loading} className="w-full bg-yellow-500 text-white py-2 rounded-lg font-bold hover:bg-yellow-600 transition">
-                    {loading ? 'Submitting...' : 'Submit'}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
+      {/* -------- VOLUNTEER FORM -------- */}
+      <div className="bg-white p-6 rounded-2xl shadow-md mb-10 max-w-2xl mx-auto">
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          Volunteer with Us
+        </h2>
+        <form onSubmit={submitVolunteer} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={volunteerData.fullName}
+            onChange={(e) =>
+              setVolunteerData({ ...volunteerData, fullName: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={volunteerData.email}
+            onChange={(e) =>
+              setVolunteerData({ ...volunteerData, email: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="tel"
+            placeholder="Phone Number"
+            value={volunteerData.phone}
+            onChange={(e) =>
+              setVolunteerData({ ...volunteerData, phone: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="text"
+            placeholder="Area of Interest"
+            value={volunteerData.interest}
+            onChange={(e) =>
+              setVolunteerData({ ...volunteerData, interest: e.target.value })
+            }
+            className="w-full p-2 border rounded-md"
+          />
+          <textarea
+            placeholder="Message"
+            value={volunteerData.message}
+            onChange={(e) =>
+              setVolunteerData({ ...volunteerData, message: e.target.value })
+            }
+            className="w-full p-2 border rounded-md"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-all"
+          >
+            {loading ? "Submitting..." : "Submit Volunteer Form"}
+          </button>
+        </form>
+        {volunteerSubmitted && (
+          <p className="text-green-600 mt-3 text-center">
+            ✅ Thank you for volunteering!
+          </p>
+        )}
       </div>
-    </AnimatedPage>
+
+      {/* -------- PARTNER FORM -------- */}
+      <div className="bg-white p-6 rounded-2xl shadow-md max-w-2xl mx-auto">
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          Partner with Us
+        </h2>
+        <form onSubmit={submitPartner} className="space-y-4">
+          <input
+            type="text"
+            placeholder="Organization Name"
+            value={partnerData.organization}
+            onChange={(e) =>
+              setPartnerData({ ...partnerData, organization: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="text"
+            placeholder="Contact Person"
+            value={partnerData.contactPerson}
+            onChange={(e) =>
+              setPartnerData({ ...partnerData, contactPerson: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={partnerData.email}
+            onChange={(e) =>
+              setPartnerData({ ...partnerData, email: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="tel"
+            placeholder="Phone Number"
+            value={partnerData.phone}
+            onChange={(e) =>
+              setPartnerData({ ...partnerData, phone: e.target.value })
+            }
+            required
+            className="w-full p-2 border rounded-md"
+          />
+          <input
+            type="text"
+            placeholder="Partnership Type"
+            value={partnerData.partnershipType}
+            onChange={(e) =>
+              setPartnerData({
+                ...partnerData,
+                partnershipType: e.target.value,
+              })
+            }
+            className="w-full p-2 border rounded-md"
+          />
+          <textarea
+            placeholder="Message"
+            value={partnerData.message}
+            onChange={(e) =>
+              setPartnerData({ ...partnerData, message: e.target.value })
+            }
+            className="w-full p-2 border rounded-md"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-all"
+          >
+            {loading ? "Submitting..." : "Submit Partner Form"}
+          </button>
+        </form>
+        {partnerSubmitted && (
+          <p className="text-green-600 mt-3 text-center">
+            ✅ Thank you for partnering with us!
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 
