@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, listAll, deleteObject } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 // -----------------
 // Firebase Config
@@ -24,8 +25,10 @@ const AdminDashboard: React.FC = () => {
 
   const [volunteers, setVolunteers] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
+
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string; ref: any }[]>([]);
 
   const [volunteerSearch, setVolunteerSearch] = useState('');
   const [partnerSearch, setPartnerSearch] = useState('');
@@ -51,12 +54,13 @@ const AdminDashboard: React.FC = () => {
   };
 
   // -----------------
-  // Fetch data
+  // Fetch volunteers and partners
   // -----------------
   useEffect(() => {
     if (authenticated) {
       fetchVolunteers();
       fetchPartners();
+      fetchUploadedFiles();
     }
   }, [authenticated]);
 
@@ -79,6 +83,23 @@ const AdminDashboard: React.FC = () => {
   };
 
   // -----------------
+  // Add Volunteer / Partner
+  // -----------------
+  const handleAdd = async (formType: 'volunteer' | 'partner', formData: any) => {
+    try {
+      const url = formType === 'volunteer'
+        ? 'http://127.0.0.1:5000/api/volunteer'
+        : 'http://127.0.0.1:5000/api/partner';
+      await axios.post(url, formData);
+      alert(`${formType.charAt(0).toUpperCase() + formType.slice(1)} added successfully!`);
+      formType === 'volunteer' ? fetchVolunteers() : fetchPartners();
+    } catch (err) {
+      console.error('Add failed:', err);
+      alert('Failed to add entry!');
+    }
+  };
+
+  // -----------------
   // Delete entry
   // -----------------
   const handleDelete = async (formType: 'volunteer' | 'partner', index: number) => {
@@ -87,15 +108,7 @@ const AdminDashboard: React.FC = () => {
 
     try {
       await axios.delete(`http://127.0.0.1:5000/api/delete/${formType}/${item.email}`);
-      if (formType === 'volunteer') {
-        const newVols = [...volunteers];
-        newVols.splice(index, 1);
-        setVolunteers(newVols);
-      } else {
-        const newPartners = [...partners];
-        newPartners.splice(index, 1);
-        setPartners(newPartners);
-      }
+      formType === 'volunteer' ? fetchVolunteers() : fetchPartners();
       alert('Deleted successfully!');
     } catch (err) {
       console.error('Error deleting entry:', err);
@@ -136,16 +149,46 @@ const AdminDashboard: React.FC = () => {
     if (!uploadFile) return;
     setUploading(true);
     try {
-      const fileRef = ref(storage, `resources/${uploadFile.name}`);
+      const uniqueName = `${uuidv4()}_${uploadFile.name}`;
+      const fileRef = ref(storage, `resources/${uniqueName}`);
       await uploadBytes(fileRef, uploadFile);
       const url = await getDownloadURL(fileRef);
       alert(`File uploaded successfully! URL: ${url}`);
+      setUploadFile(null);
+      fetchUploadedFiles(); // refresh list
     } catch (err) {
       console.error('Upload error:', err);
       alert('Upload failed!');
     } finally {
       setUploading(false);
-      setUploadFile(null);
+    }
+  };
+
+  const fetchUploadedFiles = async () => {
+    try {
+      const listRef = ref(storage, "resources/");
+      const res = await listAll(listRef);
+      const files = await Promise.all(
+        res.items.map(async (itemRef) => {
+          const url = await getDownloadURL(itemRef);
+          return { name: itemRef.name, url, ref: itemRef };
+        })
+      );
+      setUploadedFiles(files);
+    } catch (err) {
+      console.error("Error fetching uploaded files:", err);
+    }
+  };
+
+  const handleDeleteFile = async (fileRef: any) => {
+    if (!window.confirm(`Are you sure you want to delete ${fileRef.name}?`)) return;
+    try {
+      await deleteObject(fileRef);
+      alert("File deleted successfully!");
+      fetchUploadedFiles(); // refresh list
+    } catch (err) {
+      console.error("Error deleting file:", err);
+      alert("Failed to delete file!");
     }
   };
 
@@ -169,10 +212,7 @@ const AdminDashboard: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-4 text-gray-700">Admin Login</h1>
-        <form
-          onSubmit={handleLogin}
-          className="bg-white shadow-md rounded-lg p-6 w-80"
-        >
+        <form onSubmit={handleLogin} className="bg-white shadow-md rounded-lg p-6 w-80">
           <input
             type="password"
             placeholder="Enter admin password"
@@ -180,10 +220,7 @@ const AdminDashboard: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-          >
+          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
             Login
           </button>
         </form>
@@ -218,7 +255,59 @@ const AdminDashboard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 p-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
-      {/* Volunteer Submissions */}
+      {/* Add Volunteer */}
+      <section className="mb-4">
+        <h2 className="text-2xl font-semibold mb-2">Add Volunteer</h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = new FormData(e.currentTarget);
+            handleAdd('volunteer', {
+              fullName: form.get('fullName')?.toString(),
+              email: form.get('email')?.toString(),
+              phone: form.get('phone')?.toString(),
+              interest: form.get('interest')?.toString()
+            });
+            e.currentTarget.reset();
+          }}
+          className="flex gap-2 flex-wrap mb-4"
+        >
+          <input name="fullName" placeholder="Full Name" required className="border px-2 py-1"/>
+          <input name="email" placeholder="Email" required className="border px-2 py-1"/>
+          <input name="phone" placeholder="Phone" required className="border px-2 py-1"/>
+          <input name="interest" placeholder="Interest" required className="border px-2 py-1"/>
+          <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">Add</button>
+        </form>
+      </section>
+
+      {/* Add Partner */}
+      <section className="mb-4">
+        <h2 className="text-2xl font-semibold mb-2">Add Partner</h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const form = new FormData(e.currentTarget);
+            handleAdd('partner', {
+              organization: form.get('organization')?.toString(),
+              contactPerson: form.get('contactPerson')?.toString(),
+              email: form.get('email')?.toString(),
+              phone: form.get('phone')?.toString(),
+              partnershipType: form.get('partnershipType')?.toString()
+            });
+            e.currentTarget.reset();
+          }}
+          className="flex gap-2 flex-wrap mb-4"
+        >
+          <input name="organization" placeholder="Organization" required className="border px-2 py-1"/>
+          <input name="contactPerson" placeholder="Contact Person" required className="border px-2 py-1"/>
+          <input name="email" placeholder="Email" required className="border px-2 py-1"/>
+          <input name="phone" placeholder="Phone" required className="border px-2 py-1"/>
+          <input name="partnershipType" placeholder="Type" required className="border px-2 py-1"/>
+          <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">Add</button>
+        </form>
+      </section>
+
+      {/* Volunteers Table */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">Volunteer Submissions</h2>
         <input
@@ -235,63 +324,32 @@ const AdminDashboard: React.FC = () => {
             <table className="min-w-full border">
               <thead>
                 <tr className="bg-gray-200 cursor-pointer">
-                  {['fullName', 'email', 'phone', 'interest'].map((col) => (
-                    <th
-                      key={col}
-                      className="px-4 py-2 border"
-                      onClick={() => {
-                        if (volunteerSortKey === col) setVolunteerSortAsc(!volunteerSortAsc);
-                        else {
-                          setVolunteerSortKey(col);
-                          setVolunteerSortAsc(true);
-                        }
-                      }}
-                    >
-                      {col.charAt(0).toUpperCase() + col.slice(1)}
-                      {volunteerSortKey === col ? (volunteerSortAsc ? ' 🔼' : ' 🔽') : ''}
+                  {['fullName','email','phone','interest'].map(col => (
+                    <th key={col} className="px-4 py-2 border"
+                        onClick={()=>{if (volunteerSortKey===col) setVolunteerSortAsc(!volunteerSortAsc); else {setVolunteerSortKey(col); setVolunteerSortAsc(true);}}}>
+                      {col.charAt(0).toUpperCase()+col.slice(1)}
+                      {volunteerSortKey===col?(volunteerSortAsc?' 🔼':' 🔽'):''}
                     </th>
                   ))}
                   <th className="px-4 py-2 border">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredVolunteers.map((v, idx) => (
+                {filteredVolunteers.map((v, idx)=>(
                   <tr key={idx} className="text-center">
                     <td className="border px-4 py-2">
-                      <input
-                        value={v.fullName}
-                        onChange={(e) => handleEditChange('volunteer', idx, 'fullName', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={v.fullName} onChange={(e)=>handleEditChange('volunteer',idx,'fullName',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2">{v.email}</td>
                     <td className="border px-4 py-2">
-                      <input
-                        value={v.phone}
-                        onChange={(e) => handleEditChange('volunteer', idx, 'phone', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={v.phone} onChange={(e)=>handleEditChange('volunteer',idx,'phone',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2">
-                      <input
-                        value={v.interest}
-                        onChange={(e) => handleEditChange('volunteer', idx, 'interest', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={v.interest} onChange={(e)=>handleEditChange('volunteer',idx,'interest',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2 space-x-2">
-                      <button
-                        onClick={() => handleSave('volunteer', idx)}
-                        className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => handleDelete('volunteer', idx)}
-                        className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
-                      >
-                        Delete
-                      </button>
+                      <button onClick={()=>handleSave('volunteer',idx)} className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition">Save</button>
+                      <button onClick={()=>handleDelete('volunteer',idx)} className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -301,7 +359,7 @@ const AdminDashboard: React.FC = () => {
         )}
       </section>
 
-      {/* Partner Submissions */}
+      {/* Partners Table */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">Partner Submissions</h2>
         <input
@@ -311,77 +369,43 @@ const AdminDashboard: React.FC = () => {
           onChange={(e) => setPartnerSearch(e.target.value)}
           className="mb-2 px-2 py-1 border rounded w-64"
         />
-        {filteredPartners.length === 0 ? (
+        {filteredPartners.length===0?(
           <p className="text-gray-600">No partner submissions yet.</p>
-        ) : (
+        ):(
+
           <div className="overflow-x-auto">
             <table className="min-w-full border">
               <thead>
                 <tr className="bg-gray-200 cursor-pointer">
-                  {['organization', 'contactPerson', 'email', 'phone', 'partnershipType'].map((col) => (
-                    <th
-                      key={col}
-                      className="px-4 py-2 border"
-                      onClick={() => {
-                        if (partnerSortKey === col) setPartnerSortAsc(!partnerSortAsc);
-                        else {
-                          setPartnerSortKey(col);
-                          setPartnerSortAsc(true);
-                        }
-                      }}
-                    >
-                      {col.charAt(0).toUpperCase() + col.slice(1)}
-                      {partnerSortKey === col ? (partnerSortAsc ? ' 🔼' : ' 🔽') : ''}
+                  {['organization','contactPerson','email','phone','partnershipType'].map(col=>(
+                    <th key={col} className="px-4 py-2 border"
+                        onClick={()=>{if (partnerSortKey===col) setPartnerSortAsc(!partnerSortAsc); else {setPartnerSortKey(col); setPartnerSortAsc(true);}}}>
+                      {col.charAt(0).toUpperCase()+col.slice(1)}
+                      {partnerSortKey===col?(partnerSortAsc?' 🔼':' 🔽'):''}
                     </th>
                   ))}
                   <th className="px-4 py-2 border">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredPartners.map((p, idx) => (
+                {filteredPartners.map((p, idx)=>(
                   <tr key={idx} className="text-center">
                     <td className="border px-4 py-2">
-                      <input
-                        value={p.organization}
-                        onChange={(e) => handleEditChange('partner', idx, 'organization', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={p.organization} onChange={(e)=>handleEditChange('partner',idx,'organization',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2">
-                      <input
-                        value={p.contactPerson}
-                        onChange={(e) => handleEditChange('partner', idx, 'contactPerson', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={p.contactPerson} onChange={(e)=>handleEditChange('partner',idx,'contactPerson',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2">{p.email}</td>
                     <td className="border px-4 py-2">
-                      <input
-                        value={p.phone}
-                        onChange={(e) => handleEditChange('partner', idx, 'phone', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={p.phone} onChange={(e)=>handleEditChange('partner',idx,'phone',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2">
-                      <input
-                        value={p.partnershipType}
-                        onChange={(e) => handleEditChange('partner', idx, 'partnershipType', e.target.value)}
-                        className="w-full px-1 py-1 border rounded"
-                      />
+                      <input value={p.partnershipType} onChange={(e)=>handleEditChange('partner',idx,'partnershipType',e.target.value)} className="w-full px-1 py-1 border rounded"/>
                     </td>
                     <td className="border px-4 py-2 space-x-2">
-                      <button
-                        onClick={() => handleSave('partner', idx)}
-                        className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => handleDelete('partner', idx)}
-                        className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
-                      >
-                        Delete
-                      </button>
+                      <button onClick={()=>handleSave('partner',idx)} className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition">Save</button>
+                      <button onClick={()=>handleDelete('partner',idx)} className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -394,18 +418,32 @@ const AdminDashboard: React.FC = () => {
       {/* Upload Resources */}
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">Upload Resources</h2>
-        <input
-          type="file"
-          onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-          className="mb-2"
-        />
-        <button
-          onClick={handleFileUpload}
-          disabled={!uploadFile || uploading}
-          className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
-        >
+        <input type="file" onChange={(e)=>setUploadFile(e.target.files?.[0]||null)} className="mb-2"/>
+        <button onClick={handleFileUpload} disabled={!uploadFile || uploading} className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
+
+        {/* Uploaded Files List */}
+        {uploadedFiles.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold mb-2">Uploaded Files</h3>
+            <ul className="list-disc pl-5 space-y-1">
+              {uploadedFiles.map((file, idx) => (
+                <li key={idx} className="flex items-center justify-between">
+                  <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    {file.name}
+                  </a>
+                  <button 
+                    onClick={() => handleDeleteFile(file.ref)}
+                    className="ml-4 bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
     </div>
   );
