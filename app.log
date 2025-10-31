@@ -144,3 +144,21 @@
 2025-10-28 00:05:37,678 INFO: 127.0.0.1 - - [28/Oct/2025 00:05:37] "GET /api/view/volunteer HTTP/1.1" 200 -
 2025-10-28 00:09:36,706 INFO: 127.0.0.1 - - [28/Oct/2025 00:09:36] "GET /api/view/partner HTTP/1.1" 200 -
 2025-10-28 00:09:36,707 INFO: 127.0.0.1 - - [28/Oct/2025 00:09:36] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-28 00:30:52,855 INFO: 127.0.0.1 - - [28/Oct/2025 00:30:52] "OPTIONS /api/volunteer HTTP/1.1" 200 -
+2025-10-28 00:30:53,042 INFO: Volunteer added with ID: 68ffe48cf12bbcf6a7c9c348
+2025-10-28 00:30:53,045 INFO: 127.0.0.1 - - [28/Oct/2025 00:30:53] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
+2025-10-28 00:30:54,740 INFO: 127.0.0.1 - - [28/Oct/2025 00:30:54] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-31 12:01:27,746 INFO: \u2705 Connected to MongoDB successfully
+2025-10-31 12:01:29,252 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.104:5000
+2025-10-31 12:01:29,253 INFO: [33mPress CTRL+C to quit[0m
+2025-10-31 12:01:29,256 INFO:  * Restarting with stat
+2025-10-31 12:01:30,305 INFO: \u2705 Connected to MongoDB successfully
+2025-10-31 12:01:30,351 WARNING:  * Debugger is active!
+2025-10-31 12:01:30,357 INFO:  * Debugger PIN: 900-189-527
+2025-10-31 12:01:30,601 INFO: 127.0.0.1 - - [31/Oct/2025 12:01:30] "GET / HTTP/1.1" 200 -
+2025-10-31 12:01:30,691 INFO: 127.0.0.1 - - [31/Oct/2025 12:01:30] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-10-31 12:02:34,792 INFO: 127.0.0.1 - - [31/Oct/2025 12:02:34] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-31 12:02:34,793 INFO: 127.0.0.1 - - [31/Oct/2025 12:02:34] "GET /api/view/volunteer HTTP/1.1" 200 -
