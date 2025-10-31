@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:5000", // Flask backend (change to deployed URL later)
+  baseURL: "https://smart-education-backend.onrender.com", // Deployed Flask backend
 });
 
 // Example function to test API
