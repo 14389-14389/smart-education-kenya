@@ -6,17 +6,26 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const DonatePage: React.FC = () => {
   const [formData, setFormData] = useState({
-    name: '', // Changed from fullName to match backend
+    fullName: '', // Using fullName to match backend expectation
     email: '',
     phone: '',
     idNumber: '',
     amount: '',
+    currency: 'KES', // Default currency
     paymentMethod: 'M-Pesa',
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Currency options with symbols and conversion rates (approximate)
+  const currencies = [
+    { code: 'KES', symbol: 'Ksh', name: 'Kenyan Shilling', rate: 1 },
+    { code: 'USD', symbol: '$', name: 'US Dollar', rate: 0.0078 },
+    { code: 'EUR', symbol: '€', name: 'Euro', rate: 0.0072 },
+    { code: 'GBP', symbol: '£', name: 'British Pound', rate: 0.0062 },
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -28,16 +37,38 @@ const DonatePage: React.FC = () => {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // Validate amount
+    // Validate all required fields
+    if (!formData.fullName.trim()) {
+      setSubmitError('Full Name is required.');
+      setIsSubmitting(false);
+      return;
+    }
+
     const amount = parseFloat(formData.amount);
-    if (amount <= 0) {
+    if (amount <= 0 || isNaN(amount)) {
       setSubmitError('Please enter a valid donation amount.');
       setIsSubmitting(false);
       return;
     }
 
     try {
-      console.log('🔄 Submitting donation data:', formData);
+      console.log('🔄 Starting donation submission...');
+      
+      // Prepare data for backend - using fullName to match backend expectation
+      const donationData = {
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        idNumber: formData.idNumber.trim(),
+        amount: amount,
+        currency: formData.currency,
+        paymentMethod: formData.paymentMethod,
+        message: formData.message.trim(),
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('📤 Sending data to backend:', donationData);
+      console.log('🌐 API URL:', `${API_URL}/api/donate`);
 
       // 1. Submit to MongoDB backend (primary storage)
       const mongoResponse = await fetch(`${API_URL}/api/donate`, {
@@ -45,71 +76,84 @@ const DonatePage: React.FC = () => {
         headers: { 
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          ...formData,
-          amount: amount, // Ensure it's a number
-          timestamp: new Date().toISOString()
-        }),
+        body: JSON.stringify(donationData),
       });
 
+      console.log('📥 Response status:', mongoResponse.status);
+      console.log('📥 Response ok:', mongoResponse.ok);
+
       const mongoResult = await mongoResponse.json();
-      console.log('✅ MongoDB save result:', mongoResult);
+      console.log('✅ MongoDB response data:', mongoResult);
 
       if (!mongoResponse.ok) {
-        throw new Error(mongoResult.error || 'Failed to save to database');
+        // Try to get more specific error message
+        const errorMsg = mongoResult.error || mongoResult.message || mongoResult.details || 'Failed to save to database';
+        console.error('❌ Backend error details:', mongoResult);
+        throw new Error(errorMsg);
       }
 
-      // 2. Submit to Google Sheets (backup/legacy) - only if MongoDB succeeds
+      // 2. Submit to Google Sheets (backup/legacy)
       try {
         console.log('📊 Attempting Google Sheets backup...');
-        const sheetsResponse = await fetch(GOOGLE_SCRIPT_URL, {
+        await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
+          mode: 'no-cors',
           headers: { 
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
           },
-          body: new URLSearchParams({
-            ...formData,
-            timestamp: new Date().toLocaleString(),
+          body: JSON.stringify({
+            ...donationData,
+            timestamp: new Date().toLocaleString('en-KE'),
             source: 'Website Donation Form'
-          }).toString()
+          })
         });
-        
         console.log('✅ Google Sheets submission attempted');
       } catch (sheetsError) {
         console.warn('⚠️ Google Sheets submission failed:', sheetsError);
-        // Continue anyway - MongoDB is primary storage
       }
 
       setIsSubmitted(true);
       
       // Reset form
       setFormData({
-        name: '',
+        fullName: '',
         email: '',
         phone: '',
         idNumber: '',
         amount: '',
+        currency: 'KES',
         paymentMethod: 'M-Pesa',
         message: '',
       });
 
+      console.log('🎉 Donation submitted successfully!');
+
     } catch (error: any) {
       console.error('❌ Error submitting donation form:', error);
-      setSubmitError(
-        error.message || 
-        'Failed to submit donation information. Please check your connection and try again.'
-      );
+      
+      // More specific error messages
+      if (error.message.includes('fullName')) {
+        setSubmitError('Full Name field is required. Please check your input.');
+      } else if (error.message.includes('network') || error.message.includes('fetch')) {
+        setSubmitError('Network error. Please check your internet connection and try again.');
+      } else {
+        setSubmitError(error.message || 'Failed to submit donation. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Quick donation amount buttons
+  // Quick donation amount buttons in KES
   const quickAmounts = [500, 1000, 2000, 5000, 10000];
 
   const setQuickAmount = (amount: number) => {
     setFormData(prev => ({ ...prev, amount: amount.toString() }));
   };
+
+  // Get current currency symbol
+  const currentCurrency = currencies.find(c => c.code === formData.currency);
+  const currencySymbol = currentCurrency?.symbol || 'Ksh';
 
   return (
     <AnimatedPage>
@@ -135,12 +179,17 @@ const DonatePage: React.FC = () => {
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <p className="text-lg font-semibold text-gray-800 mb-2">📱 M-Pesa (Send Money)</p>
                 <p className="text-xl font-bold text-bright-blue-700">+254 742 180636</p>
-                <p className="text-sm text-gray-600 mt-1">Name: SMART EDUCATION</p>
+                <p className="text-sm text-gray-600 mt-1">Name: Lucky Kitonyi</p>
               </div>
               <div className="text-center p-4 bg-yellow-50 rounded-lg">
                 <p className="text-lg font-semibold text-gray-800 mb-2">💳 PayPal</p>
                 <p className="text-xl font-bold text-bright-blue-700">kevinmuli047@gmail.com</p>
                 <p className="text-sm text-gray-600 mt-1">Send to: Kevin Muli</p>
+              </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-lg font-semibold text-gray-800 mb-2">🏦 Bank Transfer</p>
+                <p className="text-xl font-bold text-bright-blue-700">Contact us for bank details</p>
+                <p className="text-sm text-gray-600 mt-1">Available for larger donations</p>
               </div>
             </div>
           </div>
@@ -158,6 +207,7 @@ const DonatePage: React.FC = () => {
                   <div>
                     <p className="font-bold">Submission Error</p>
                     <p>{submitError}</p>
+                    <p className="text-sm mt-1">Please check all fields and try again.</p>
                   </div>
                 </div>
               </div>
@@ -184,14 +234,14 @@ const DonatePage: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
                       Full Name *
                     </label>
                     <input
                       type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
+                      id="fullName"
+                      name="fullName"
+                      value={formData.fullName}
                       onChange={handleChange}
                       required
                       className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -250,32 +300,76 @@ const DonatePage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Quick Amount Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quick Amount Selection (Ksh)
-                  </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
-                    {quickAmounts.map((amount) => (
-                      <button
-                        key={amount}
-                        type="button"
-                        onClick={() => setQuickAmount(amount)}
-                        className={`py-2 px-3 rounded-lg border transition ${
-                          formData.amount === amount.toString()
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                        }`}
-                      >
-                        {amount.toLocaleString()}
-                      </button>
-                    ))}
+                {/* Currency Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+                      Currency *
+                    </label>
+                    <select
+                      id="currency"
+                      name="currency"
+                      value={formData.currency}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {currencies.map(currency => (
+                        <option key={currency.code} value={currency.code}>
+                          {currency.symbol} - {currency.name} ({currency.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1">
+                      Payment Method *
+                    </label>
+                    <select
+                      id="paymentMethod"
+                      name="paymentMethod"
+                      value={formData.paymentMethod}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="M-Pesa">M-Pesa</option>
+                      <option value="PayPal">PayPal</option>
+                      <option value="Bank Transfer">Bank Transfer</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Credit Card">Credit Card</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                 </div>
 
+                {/* Quick Amount Selection (KES only) */}
+                {formData.currency === 'KES' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Quick Amount Selection (KES)
+                    </label>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-3">
+                      {quickAmounts.map((amount) => (
+                        <button
+                          key={amount}
+                          type="button"
+                          onClick={() => setQuickAmount(amount)}
+                          className={`py-2 px-3 rounded-lg border transition ${
+                            formData.amount === amount.toString()
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                          }`}
+                        >
+                          {amount.toLocaleString()}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
-                    Donation Amount (Ksh) *
+                    Donation Amount ({currencySymbol}) *
                   </label>
                   <input
                     type="number"
@@ -285,27 +379,10 @@ const DonatePage: React.FC = () => {
                     onChange={handleChange}
                     required
                     min="1"
+                    step="0.01"
                     className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Enter amount in Kenyan Shillings"
+                    placeholder={`Enter amount in ${currencySymbol}`}
                   />
-                </div>
-
-                <div>
-                  <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1">
-                    Payment Method *
-                  </label>
-                  <select
-                    id="paymentMethod"
-                    name="paymentMethod"
-                    value={formData.paymentMethod}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="M-Pesa">M-Pesa</option>
-                    <option value="PayPal">PayPal</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Cash">Cash</option>
-                  </select>
                 </div>
 
                 <div>
@@ -322,6 +399,16 @@ const DonatePage: React.FC = () => {
                     placeholder="Any additional message or dedication..."
                   ></textarea>
                 </div>
+
+                {/* Currency Conversion Note */}
+                {formData.currency !== 'KES' && formData.amount && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Your donation of {currencySymbol}{parseFloat(formData.amount).toLocaleString()} {formData.currency} 
+                      will be converted to Kenyan Shillings at the current exchange rate.
+                    </p>
+                  </div>
+                )}
 
                 <button
                   type="submit"
