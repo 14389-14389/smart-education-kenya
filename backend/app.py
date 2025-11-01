@@ -38,6 +38,7 @@ try:
 
     volunteer_collection = db["volunteers"]
     partner_collection = db["partners"]
+    donation_collection = db["donations"]  # Add donations collection
     
     # Initialize GridFS for file storage
     fs = GridFS(db)
@@ -55,7 +56,7 @@ def home():
     return jsonify({
         "status": "running",
         "message": "Welcome to the Get Involved API (Flask + MongoDB)",
-        "features": ["volunteers", "partners", "file_upload"]
+        "features": ["volunteers", "partners", "donations", "file_upload"]
     }), 200
 
 # --------------------------
@@ -113,6 +114,33 @@ def save_partner():
         return jsonify({"error": "Internal Server Error"}), 500
 
 # --------------------------
+# 💰 DONATION FORM ROUTE
+# --------------------------
+@app.route("/api/donate", methods=["POST"])
+def save_donation():
+    try:
+        data = request.get_json(force=True)
+        required_fields = ["fullName", "email", "phone", "idNumber", "amount", "paymentMethod"]
+
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"error": f"Missing field: {field}"}), 400
+
+        data["timestamp"] = datetime.datetime.utcnow()
+        result = donation_collection.insert_one(data)
+        logging.info(f"Donation added with ID: {result.inserted_id}")
+
+        return jsonify({
+            "success": True,
+            "message": "Donation information submitted successfully",
+            "id": str(result.inserted_id)
+        }), 201
+
+    except Exception as e:
+        logging.error(f"Error saving donation: {e}")
+        return jsonify({"error": "Internal Server Error"}), 500
+
+# --------------------------
 # 🧾 VIEW DATA (ADMIN)
 # --------------------------
 @app.route("/api/view/<string:form_type>", methods=["GET"])
@@ -122,6 +150,8 @@ def view_data(form_type):
             data = list(volunteer_collection.find({}, {"_id": 0}))
         elif form_type == "partner":
             data = list(partner_collection.find({}, {"_id": 0}))
+        elif form_type == "donations":
+            data = list(donation_collection.find({}, {"_id": 0}))
         else:
             return jsonify({"error": "Invalid form type"}), 400
 
@@ -141,6 +171,8 @@ def delete_entry(form_type, email):
             result = volunteer_collection.delete_one({"email": email})
         elif form_type == "partner":
             result = partner_collection.delete_one({"email": email})
+        elif form_type == "donations":
+            result = donation_collection.delete_one({"email": email})
         else:
             return jsonify({"error": "Invalid form type"}), 400
 
@@ -165,6 +197,8 @@ def update_entry(form_type, email):
             result = volunteer_collection.update_one({"email": email}, {"$set": data})
         elif form_type == "partner":
             result = partner_collection.update_one({"email": email}, {"$set": data})
+        elif form_type == "donations":
+            result = donation_collection.update_one({"email": email}, {"$set": data})
         else:
             return jsonify({"error": "Invalid form type"}), 400
 
@@ -313,12 +347,14 @@ def health_collections():
         collections = db.list_collection_names()
         has_volunteers = "volunteers" in collections
         has_partners = "partners" in collections
+        has_donations = "donations" in collections
         
         return jsonify({
             "status": "healthy",
             "collections": collections,
             "has_volunteers_collection": has_volunteers,
-            "has_partners_collection": has_partners
+            "has_partners_collection": has_partners,
+            "has_donations_collection": has_donations
         }), 200
     except Exception as e:
         return jsonify({"status": "error", "error": str(e)}), 500
@@ -360,6 +396,29 @@ def health_partners():
         
         return jsonify({
             "status": "healthy", 
+            "count": count,
+            "has_data": count > 0,
+            "sample_structure": sample if sample else "No data yet"
+        }), 200
+    except Exception as e:
+        return jsonify({"status": "error", "error": str(e)}), 500
+
+@app.route("/api/health/donations", methods=["GET"])
+def health_donations():
+    """Safe endpoint to check donations data without exposing details"""
+    try:
+        count = donation_collection.count_documents({})
+        # Get one sample without sensitive data
+        sample = donation_collection.find_one({}, {
+            "_id": 0, 
+            "email": 0, 
+            "phone": 0,
+            "idNumber": 0,
+            "timestamp": 0
+        })
+        
+        return jsonify({
+            "status": "healthy",
             "count": count,
             "has_data": count > 0,
             "sample_structure": sample if sample else "No data yet"

@@ -12,6 +12,7 @@ const AdminDashboard: React.FC = () => {
 
   const [volunteers, setVolunteers] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
+  const [donations, setDonations] = useState<any[]>([]);
 
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -93,6 +94,7 @@ const AdminDashboard: React.FC = () => {
     if (authenticated) {
       fetchVolunteers();
       fetchPartners();
+      fetchDonations(); // Add this
       fetchUploadedFiles();
       checkHealth();
     }
@@ -161,6 +163,15 @@ const AdminDashboard: React.FC = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDonations = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/view/donations`);
+      setDonations(res.data.data);
+    } catch (err) {
+      console.error('Error fetching donations:', err);
     }
   };
 
@@ -667,7 +678,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Partners Table */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Partners ({filteredPartners.length})</h2>
           <input
@@ -748,6 +759,37 @@ const AdminDashboard: React.FC = () => {
                       </button>
                     </div>
                   </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Donations Table - You can add this section */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Donations ({donations.length})</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b">Name</th>
+                <th className="py-2 px-4 border-b">Email</th>
+                <th className="py-2 px-4 border-b">Amount</th>
+                <th className="py-2 px-4 border-b">Message</th>
+                <th className="py-2 px-4 border-b">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {donations.map((donation, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{donation.name || 'N/A'}</td>
+                  <td className="py-2 px-4 border-b">{donation.email || 'N/A'}</td>
+                  <td className="py-2 px-4 border-b">${donation.amount || '0'}</td>
+                  <td className="py-2 px-4 border-b">{donation.message || 'No message'}</td>
+                  <td className="py-2 px-4 border-b">{donation.createdAt ? new Date(donation.createdAt).toLocaleDateString() : 'N/A'}</td>
                 </tr>
               ))}
             </tbody>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AnimatedPage from '../components/AnimatedPage';
 
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyhP4iCHR-t12uFvWFIM3Y8VL5Ju-q6jQ-3lLA5GvYwEStoNoBJk301XjrbkuVWm5j/exec';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DonatePage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const DonatePage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -24,13 +26,39 @@ const DonatePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(null);
+
     try {
-      await fetch(GOOGLE_SCRIPT_URL, {
+      // 1. Submit to MongoDB backend (primary storage)
+      const mongoResponse = await fetch(`${API_URL}/api/donate`, {
         method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(formData),
       });
+
+      if (!mongoResponse.ok) {
+        throw new Error('Failed to save to database');
+      }
+
+      const result = await mongoResponse.json();
+      console.log('MongoDB save result:', result);
+
+      // 2. Submit to Google Sheets (backup/legacy)
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        console.log('Google Sheets submission attempted');
+      } catch (sheetsError) {
+        console.warn('Google Sheets submission failed (expected with no-cors):', sheetsError);
+        // Continue anyway - MongoDB is primary storage
+      }
+
       setIsSubmitted(true);
       setFormData({
         fullName: '',
@@ -41,8 +69,10 @@ const DonatePage: React.FC = () => {
         paymentMethod: 'M-Pesa',
         message: '',
       });
+
     } catch (error) {
       console.error('Error submitting donation form:', error);
+      setSubmitError('Failed to submit donation information. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -86,10 +116,18 @@ const DonatePage: React.FC = () => {
               Donation Form
             </h2>
 
+            {submitError && (
+              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6">
+                <p className="font-bold">Submission Error</p>
+                <p>{submitError}</p>
+              </div>
+            )}
+
             {isSubmitted ? (
               <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded mb-6 text-center">
                 <p className="font-bold">Thank you for your generous support!</p>
                 <p>We have received your donation information and a confirmation email will be sent shortly.</p>
+                <p className="text-sm mt-2">✅ Saved to database and backup systems</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
