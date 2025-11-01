@@ -190,3 +190,53 @@
 2025-10-31 14:19:39,654 INFO: Volunteer added with ID: 69049b4b0edc80556ccc07f5
 2025-10-31 14:19:39,655 INFO: 127.0.0.1 - - [31/Oct/2025 14:19:39] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
 2025-10-31 14:19:41,413 INFO: 127.0.0.1 - - [31/Oct/2025 14:19:41] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-31 17:04:45,625 INFO: \u2705 Connected to MongoDB successfully
+2025-10-31 17:04:47,020 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.104:5000
+2025-10-31 17:04:47,020 INFO: [33mPress CTRL+C to quit[0m
+2025-10-31 17:04:47,024 INFO:  * Restarting with stat
+2025-10-31 17:04:47,894 INFO: \u2705 Connected to MongoDB successfully
+2025-10-31 17:04:47,924 WARNING:  * Debugger is active!
+2025-10-31 17:04:47,927 INFO:  * Debugger PIN: 900-189-527
+2025-10-31 17:05:32,137 INFO: 127.0.0.1 - - [31/Oct/2025 17:05:32] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-10-31 17:05:32,143 INFO: 127.0.0.1 - - [31/Oct/2025 17:05:32] "GET /api/view/partner HTTP/1.1" 200 -
+2025-10-31 17:05:48,668 INFO: 127.0.0.1 - - [31/Oct/2025 17:05:48] "OPTIONS /api/volunteer HTTP/1.1" 200 -
+2025-10-31 17:05:48,847 INFO: Volunteer added with ID: 6904c23ccabebb1110a6cdb1
+2025-10-31 17:05:48,850 INFO: 127.0.0.1 - - [31/Oct/2025 17:05:48] "[35m[1mPOST /api/volunteer HTTP/1.1[0m" 201 -
+2025-10-31 17:16:52,176 INFO: \u2705 Connected to MongoDB successfully
+2025-10-31 17:16:53,541 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.104:5000
+2025-10-31 17:16:53,541 INFO: [33mPress CTRL+C to quit[0m
+2025-10-31 17:16:53,543 INFO:  * Restarting with stat
+2025-10-31 17:16:54,512 INFO: \u2705 Connected to MongoDB successfully
+2025-10-31 17:16:54,549 WARNING:  * Debugger is active!
+2025-10-31 17:16:54,555 INFO:  * Debugger PIN: 900-189-527
+2025-11-02 01:00:07,180 INFO: \u2705 Connected to MongoDB successfully
+2025-11-02 01:00:08,643 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.104:5000
+2025-11-02 01:00:08,644 INFO: [33mPress CTRL+C to quit[0m
+2025-11-02 01:00:08,655 INFO:  * Restarting with stat
+2025-11-02 01:00:09,634 INFO: \u2705 Connected to MongoDB successfully
+2025-11-02 01:00:09,669 WARNING:  * Debugger is active!
+2025-11-02 01:00:09,672 INFO:  * Debugger PIN: 705-387-221
+2025-11-02 01:10:37,507 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\backend\\app.py', reloading
+2025-11-02 01:10:38,074 INFO:  * Restarting with stat
+2025-11-02 01:10:39,427 INFO: \u2705 Connected to MongoDB successfully
+2025-11-02 01:10:39,467 WARNING:  * Debugger is active!
+2025-11-02 01:10:39,471 INFO:  * Debugger PIN: 705-387-221
+2025-11-02 01:11:12,309 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\backend\\app.py', reloading
+2025-11-02 01:11:12,837 INFO:  * Restarting with stat
+2025-11-02 01:11:14,064 INFO: \u2705 Connected to MongoDB successfully
+2025-11-02 01:11:14,127 WARNING:  * Debugger is active!
+2025-11-02 01:11:14,131 INFO:  * Debugger PIN: 705-387-221
+2025-11-02 01:18:04,050 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\backend\\app.py', reloading
+2025-11-02 01:18:04,515 INFO:  * Restarting with stat
+2025-11-02 01:18:06,237 INFO: \u2705 Connected to MongoDB successfully
+2025-11-02 01:18:06,291 WARNING:  * Debugger is active!
+2025-11-02 01:18:06,296 INFO:  * Debugger PIN: 705-387-221
