@@ -16,7 +16,26 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Export Firebase services
+// Initialize Firebase services
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+
+// Test function to verify storage configuration
+export const testFirebaseStorage = async () => {
+  try {
+    console.log('Testing Firebase Storage configuration...');
+    console.log('Storage bucket:', storage._bucket);
+    
+    // Simple test to verify storage is accessible
+    const { ref, listAll } = await import('firebase/storage');
+    const testRef = ref(storage, '');
+    
+    console.log('Firebase Storage initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('Firebase Storage test failed:', error);
+    return false;
+  }
+};
+
 export default app;

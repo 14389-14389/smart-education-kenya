@@ -250,3 +250,5 @@
 2025-11-02 01:19:19,479 INFO: \u2705 Connected to MongoDB successfully
 2025-11-02 01:19:19,516 WARNING:  * Debugger is active!
 2025-11-02 01:19:19,519 INFO:  * Debugger PIN: 705-387-221
+2025-11-02 01:29:15,847 INFO:  * Detected change in 'C:\\Users\\kevin\\OneDrive\\Desktop\\smart-education\\backend\\app.py', reloading
+2025-11-02 01:29:16,871 INFO:  * Restarting with stat

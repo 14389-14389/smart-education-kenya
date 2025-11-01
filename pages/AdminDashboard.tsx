@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, uploadBytes, getDownloadURL, listAll, deleteObject } from "firebase/storage";
-import { v4 as uuidv4 } from "uuid";
 
 // -----------------
-// Firebase Config
+// Base API URL
 // -----------------
-const firebaseConfig = {
-  apiKey: "<YOUR_FIREBASE_API_KEY>",
-  authDomain: "<YOUR_FIREBASE_AUTH_DOMAIN>",
-  projectId: "<YOUR_FIREBASE_PROJECT_ID>",
-  storageBucket: "<YOUR_FIREBASE_STORAGE_BUCKET>",
-  messagingSenderId: "<YOUR_MESSAGING_SENDER_ID>",
-  appId: "<YOUR_APP_ID>"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const storage = getStorage(firebaseApp);
+const API_URL = import.meta.env.VITE_API_URL;
 
 const AdminDashboard: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -28,7 +15,14 @@ const AdminDashboard: React.FC = () => {
 
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<{ name: string; url: string; ref: any }[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<{ 
+    id: string; 
+    name: string; 
+    originalName: string;
+    url: string; 
+    size: number;
+    uploadDate: string;
+  }[]>([]);
 
   const [volunteerSearch, setVolunteerSearch] = useState('');
   const [partnerSearch, setPartnerSearch] = useState('');
@@ -39,7 +33,46 @@ const AdminDashboard: React.FC = () => {
   const [partnerSortKey, setPartnerSortKey] = useState<string>('organization');
   const [partnerSortAsc, setPartnerSortAsc] = useState(true);
 
+  const [newVolunteer, setNewVolunteer] = useState({
+    fullName: '', email: '', phone: '', interest: '', message: ''
+  });
+  
+  const [newPartner, setNewPartner] = useState({
+    organization: '', contactPerson: '', email: '', phone: '', partnershipType: '', message: ''
+  });
+
+  const [healthStatus, setHealthStatus] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
   const correctPassword = 'smart123';
+
+  // -----------------
+  // Health Check
+  // -----------------
+  const checkHealth = async () => {
+    try {
+      console.log('🏥 Checking live site health...');
+      
+      const [collectionsRes, volunteersRes, partnersRes] = await Promise.all([
+        axios.get(`${API_URL}/api/health/collections`),
+        axios.get(`${API_URL}/api/health/volunteers`),
+        axios.get(`${API_URL}/api/health/partners`)
+      ]);
+      
+      const healthData = {
+        collections: collectionsRes.data,
+        volunteers: volunteersRes.data,
+        partners: partnersRes.data
+      };
+      
+      console.log('Health check results:', healthData);
+      setHealthStatus(healthData);
+      
+    } catch (err: any) {
+      console.error('Health check failed:', err);
+      setHealthStatus({ error: err.message });
+    }
+  };
 
   // -----------------
   // Login
@@ -54,48 +87,118 @@ const AdminDashboard: React.FC = () => {
   };
 
   // -----------------
-  // Fetch volunteers and partners
+  // Fetch data
   // -----------------
   useEffect(() => {
     if (authenticated) {
       fetchVolunteers();
       fetchPartners();
       fetchUploadedFiles();
+      checkHealth();
     }
   }, [authenticated]);
 
   const fetchVolunteers = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:5000/api/view/volunteer');
-      setVolunteers(res.data.data);
-    } catch (err) {
-      console.error('Error fetching volunteers:', err);
+      setLoading(true);
+      console.log('🔍 Fetching volunteers from:', `${API_URL}/api/view/volunteer`);
+      
+      const res = await axios.get(`${API_URL}/api/view/volunteer`);
+      console.log('📊 Volunteers API response:', res.data);
+      
+      if (res.data && res.data.data) {
+        console.log(`✅ Loaded ${res.data.data.length} volunteers`);
+        setVolunteers(res.data.data);
+      } else {
+        console.log('❌ No volunteers data found in response');
+        console.log('Full response:', res.data);
+        setVolunteers([]);
+      }
+    } catch (err: any) {
+      console.error('❌ Error fetching volunteers:', err);
+      console.error('Error status:', err.response?.status);
+      console.error('Error data:', err.response?.data);
+      
+      if (err.response?.status === 404) {
+        alert('Volunteers API endpoint not found. Please check backend routes.');
+      } else if (err.response?.status === 500) {
+        alert('Server error when fetching volunteers. Check backend logs.');
+      } else {
+        alert('Network error when fetching volunteers. Check connection.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchPartners = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:5000/api/view/partner');
-      setPartners(res.data.data);
+      setLoading(true);
+      console.log('🔍 Fetching partners from:', `${API_URL}/api/view/partner`);
+      
+      const res = await axios.get(`${API_URL}/api/view/partner`);
+      console.log('📊 Partners API response:', res.data);
+      
+      if (res.data && res.data.data) {
+        console.log(`✅ Loaded ${res.data.data.length} partners`);
+        setPartners(res.data.data);
+      } else {
+        console.log('❌ No partners data found in response');
+        console.log('Full response:', res.data);
+        setPartners([]);
+      }
+    } catch (err: any) {
+      console.error('❌ Error fetching partners:', err);
+      console.error('Error status:', err.response?.status);
+      console.error('Error data:', err.response?.data);
+      
+      if (err.response?.status === 404) {
+        alert('Partners API endpoint not found. Please check backend routes.');
+      } else if (err.response?.status === 500) {
+        alert('Server error when fetching partners. Check backend logs.');
+      } else {
+        alert('Network error when fetching partners. Check connection.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUploadedFiles = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/files`);
+      setUploadedFiles(response.data);
     } catch (err) {
-      console.error('Error fetching partners:', err);
+      console.error("Error fetching uploaded files:", err);
     }
   };
 
   // -----------------
   // Add Volunteer / Partner
   // -----------------
-  const handleAdd = async (formType: 'volunteer' | 'partner', formData: any) => {
+  const handleAddVolunteer = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const url = formType === 'volunteer'
-        ? 'http://127.0.0.1:5000/api/volunteer'
-        : 'http://127.0.0.1:5000/api/partner';
-      await axios.post(url, formData);
-      alert(`${formType.charAt(0).toUpperCase() + formType.slice(1)} added successfully!`);
-      formType === 'volunteer' ? fetchVolunteers() : fetchPartners();
+      await axios.post(`${API_URL}/api/volunteer`, newVolunteer);
+      alert('Volunteer added successfully!');
+      setNewVolunteer({ fullName: '', email: '', phone: '', interest: '', message: '' });
+      fetchVolunteers();
     } catch (err) {
       console.error('Add failed:', err);
-      alert('Failed to add entry!');
+      alert('Failed to add volunteer!');
+    }
+  };
+
+  const handleAddPartner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_URL}/api/partner`, newPartner);
+      alert('Partner added successfully!');
+      setNewPartner({ organization: '', contactPerson: '', email: '', phone: '', partnershipType: '', message: '' });
+      fetchPartners();
+    } catch (err) {
+      console.error('Add failed:', err);
+      alert('Failed to add partner!');
     }
   };
 
@@ -107,7 +210,7 @@ const AdminDashboard: React.FC = () => {
     if (!window.confirm(`Are you sure you want to delete this ${formType}?`)) return;
 
     try {
-      await axios.delete(`http://127.0.0.1:5000/api/delete/${formType}/${item.email}`);
+      await axios.delete(`${API_URL}/api/delete/${formType}/${item.email}`);
       formType === 'volunteer' ? fetchVolunteers() : fetchPartners();
       alert('Deleted successfully!');
     } catch (err) {
@@ -134,7 +237,7 @@ const AdminDashboard: React.FC = () => {
   const handleSave = async (formType: 'volunteer' | 'partner', index: number) => {
     const item = formType === 'volunteer' ? volunteers[index] : partners[index];
     try {
-      await axios.put(`http://127.0.0.1:5000/api/update/${formType}/${item.email}`, item);
+      await axios.put(`${API_URL}/api/update/${formType}/${item.email}`, item);
       alert('Updated successfully!');
     } catch (err) {
       console.error('Error updating entry:', err);
@@ -143,49 +246,52 @@ const AdminDashboard: React.FC = () => {
   };
 
   // -----------------
-  // Firebase Upload
+  // MongoDB File Upload
   // -----------------
   const handleFileUpload = async () => {
-    if (!uploadFile) return;
+    if (!uploadFile) {
+      alert('Please select a file first');
+      return;
+    }
+    
     setUploading(true);
     try {
-      const uniqueName = `${uuidv4()}_${uploadFile.name}`;
-      const fileRef = ref(storage, `resources/${uniqueName}`);
-      await uploadBytes(fileRef, uploadFile);
-      const url = await getDownloadURL(fileRef);
-      alert(`File uploaded successfully! URL: ${url}`);
-      setUploadFile(null);
-      fetchUploadedFiles(); // refresh list
-    } catch (err) {
+      const formData = new FormData();
+      formData.append('file', uploadFile);
+
+      console.log('Uploading file:', uploadFile.name, 'Size:', uploadFile.size);
+      
+      const response = await axios.post(`${API_URL}/api/upload`, formData, {
+        headers: { 
+          'Content-Type': 'multipart/form-data'
+        },
+        timeout: 30000
+      });
+
+      console.log('Upload response:', response.data);
+      
+      if (response.data.success) {
+        alert('File uploaded successfully!');
+        setUploadFile(null);
+        fetchUploadedFiles();
+      } else {
+        alert('Upload failed: ' + (response.data.error || 'Unknown error'));
+      }
+    } catch (err: any) {
       console.error('Upload error:', err);
-      alert('Upload failed!');
+      console.error('Error response:', err.response?.data);
+      alert('Upload failed: ' + (err.response?.data?.error || err.message || 'Network error'));
     } finally {
       setUploading(false);
     }
   };
 
-  const fetchUploadedFiles = async () => {
+  const handleDeleteFile = async (fileId: string, fileName: string) => {
+    if (!window.confirm(`Are you sure you want to delete ${fileName}?`)) return;
     try {
-      const listRef = ref(storage, "resources/");
-      const res = await listAll(listRef);
-      const files = await Promise.all(
-        res.items.map(async (itemRef) => {
-          const url = await getDownloadURL(itemRef);
-          return { name: itemRef.name, url, ref: itemRef };
-        })
-      );
-      setUploadedFiles(files);
-    } catch (err) {
-      console.error("Error fetching uploaded files:", err);
-    }
-  };
-
-  const handleDeleteFile = async (fileRef: any) => {
-    if (!window.confirm(`Are you sure you want to delete ${fileRef.name}?`)) return;
-    try {
-      await deleteObject(fileRef);
+      await axios.delete(`${API_URL}/api/files/${fileId}`);
       alert("File deleted successfully!");
-      fetchUploadedFiles(); // refresh list
+      fetchUploadedFiles();
     } catch (err) {
       console.error("Error deleting file:", err);
       alert("Failed to delete file!");
@@ -233,9 +339,9 @@ const AdminDashboard: React.FC = () => {
   // -----------------
   const filteredVolunteers = sortData(
     volunteers.filter(v =>
-      v.fullName.toLowerCase().includes(volunteerSearch.toLowerCase()) ||
-      v.email.toLowerCase().includes(volunteerSearch.toLowerCase()) ||
-      v.interest.toLowerCase().includes(volunteerSearch.toLowerCase())
+      v.fullName?.toLowerCase().includes(volunteerSearch.toLowerCase()) ||
+      v.email?.toLowerCase().includes(volunteerSearch.toLowerCase()) ||
+      v.interest?.toLowerCase().includes(volunteerSearch.toLowerCase())
     ),
     volunteerSortKey,
     volunteerSortAsc
@@ -243,9 +349,9 @@ const AdminDashboard: React.FC = () => {
 
   const filteredPartners = sortData(
     partners.filter(p =>
-      p.organization.toLowerCase().includes(partnerSearch.toLowerCase()) ||
-      p.contactPerson.toLowerCase().includes(partnerSearch.toLowerCase()) ||
-      p.partnershipType.toLowerCase().includes(partnerSearch.toLowerCase())
+      p.organization?.toLowerCase().includes(partnerSearch.toLowerCase()) ||
+      p.contactPerson?.toLowerCase().includes(partnerSearch.toLowerCase()) ||
+      p.partnershipType?.toLowerCase().includes(partnerSearch.toLowerCase())
     ),
     partnerSortKey,
     partnerSortAsc
@@ -253,198 +359,401 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Admin Dashboard - Live</h1>
+      
+      {/* Health Status */}
+      {healthStatus && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="text-lg font-semibold">🏥 System Health</h3>
+            <button 
+              onClick={checkHealth}
+              className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+            >
+              Refresh Health
+            </button>
+          </div>
+          
+          {healthStatus.error ? (
+            <div className="text-red-600">Health check failed: {healthStatus.error}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className={`p-2 rounded ${healthStatus.collections?.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
+                <strong>Database:</strong> {healthStatus.collections?.status || 'unknown'}
+                <br/>
+                Volunteers Collection: {healthStatus.collections?.has_volunteers_collection ? '✅' : '❌'}
+                <br/>
+                Partners Collection: {healthStatus.collections?.has_partners_collection ? '✅' : '❌'}
+              </div>
+              
+              <div className={`p-2 rounded ${healthStatus.volunteers?.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
+                <strong>Volunteers:</strong> {healthStatus.volunteers?.status || 'unknown'}
+                <br/>
+                Count: {healthStatus.volunteers?.count || 0}
+                <br/>
+                Has Data: {healthStatus.volunteers?.has_data ? '✅' : '❌'}
+              </div>
+              
+              <div className={`p-2 rounded ${healthStatus.partners?.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
+                <strong>Partners:</strong> {healthStatus.partners?.status || 'unknown'}
+                <br/>
+                Count: {healthStatus.partners?.count || 0}
+                <br/>
+                Has Data: {healthStatus.partners?.has_data ? '✅' : '❌'}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Add Volunteer */}
-      <section className="mb-4">
-        <h2 className="text-2xl font-semibold mb-2">Add Volunteer</h2>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = new FormData(e.currentTarget);
-            handleAdd('volunteer', {
-              fullName: form.get('fullName')?.toString(),
-              email: form.get('email')?.toString(),
-              phone: form.get('phone')?.toString(),
-              interest: form.get('interest')?.toString()
-            });
-            e.currentTarget.reset();
-          }}
-          className="flex gap-2 flex-wrap mb-4"
-        >
-          <input name="fullName" placeholder="Full Name" required className="border px-2 py-1"/>
-          <input name="email" placeholder="Email" required className="border px-2 py-1"/>
-          <input name="phone" placeholder="Phone" required className="border px-2 py-1"/>
-          <input name="interest" placeholder="Interest" required className="border px-2 py-1"/>
-          <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">Add</button>
-        </form>
-      </section>
+      {/* Loading Indicator */}
+      {loading && (
+        <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6 text-center">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+            Loading data...
+          </div>
+        </div>
+      )}
 
-      {/* Add Partner */}
-      <section className="mb-4">
-        <h2 className="text-2xl font-semibold mb-2">Add Partner</h2>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = new FormData(e.currentTarget);
-            handleAdd('partner', {
-              organization: form.get('organization')?.toString(),
-              contactPerson: form.get('contactPerson')?.toString(),
-              email: form.get('email')?.toString(),
-              phone: form.get('phone')?.toString(),
-              partnershipType: form.get('partnershipType')?.toString()
-            });
-            e.currentTarget.reset();
-          }}
-          className="flex gap-2 flex-wrap mb-4"
-        >
-          <input name="organization" placeholder="Organization" required className="border px-2 py-1"/>
-          <input name="contactPerson" placeholder="Contact Person" required className="border px-2 py-1"/>
-          <input name="email" placeholder="Email" required className="border px-2 py-1"/>
-          <input name="phone" placeholder="Phone" required className="border px-2 py-1"/>
-          <input name="partnershipType" placeholder="Type" required className="border px-2 py-1"/>
-          <button type="submit" className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition">Add</button>
+      {/* File Upload Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Upload Resources</h2>
+        <div className="flex items-center gap-4 mb-6">
+          <input
+            type="file"
+            onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+            className="flex-1 border border-gray-300 rounded-md px-3 py-2"
+          />
+          <button
+            onClick={handleFileUpload}
+            disabled={!uploadFile || uploading}
+            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            {uploading ? 'Uploading...' : 'Upload File'}
+          </button>
+        </div>
+
+        {/* Uploaded Files */}
+        <div>
+          <h3 className="text-lg font-medium mb-3">Uploaded Files ({uploadedFiles.length})</h3>
+          {uploadedFiles.length === 0 ? (
+            <p className="text-gray-500">No files uploaded yet.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {uploadedFiles.map((file) => (
+                <div key={file.id} className="border rounded-lg p-4 bg-gray-50">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-medium truncate flex-1" title={file.originalName}>
+                      {file.originalName}
+                    </h4>
+                    <button
+                      onClick={() => handleDeleteFile(file.id, file.originalName)}
+                      className="text-red-500 hover:text-red-700 ml-2"
+                      title="Delete file"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                  <a
+                    href={`${API_URL}${file.url}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 inline-block"
+                  >
+                    Download
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Add Volunteer Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Add New Volunteer</h2>
+        <form onSubmit={handleAddVolunteer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder="Full Name"
+            value={newVolunteer.fullName}
+            onChange={(e) => setNewVolunteer({...newVolunteer, fullName: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={newVolunteer.email}
+            onChange={(e) => setNewVolunteer({...newVolunteer, email: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="tel"
+            placeholder="Phone"
+            value={newVolunteer.phone}
+            onChange={(e) => setNewVolunteer({...newVolunteer, phone: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Interest"
+            value={newVolunteer.interest}
+            onChange={(e) => setNewVolunteer({...newVolunteer, interest: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          />
+          <textarea
+            placeholder="Message"
+            value={newVolunteer.message}
+            onChange={(e) => setNewVolunteer({...newVolunteer, message: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2 md:col-span-2"
+            rows={3}
+          />
+          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 md:col-span-2">
+            Add Volunteer
+          </button>
         </form>
-      </section>
+      </div>
+
+      {/* Add Partner Section */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Add New Partner</h2>
+        <form onSubmit={handleAddPartner} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder="Organization"
+            value={newPartner.organization}
+            onChange={(e) => setNewPartner({...newPartner, organization: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Contact Person"
+            value={newPartner.contactPerson}
+            onChange={(e) => setNewPartner({...newPartner, contactPerson: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={newPartner.email}
+            onChange={(e) => setNewPartner({...newPartner, email: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="tel"
+            placeholder="Phone"
+            value={newPartner.phone}
+            onChange={(e) => setNewPartner({...newPartner, phone: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Partnership Type"
+            value={newPartner.partnershipType}
+            onChange={(e) => setNewPartner({...newPartner, partnershipType: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          />
+          <textarea
+            placeholder="Message"
+            value={newPartner.message}
+            onChange={(e) => setNewPartner({...newPartner, message: e.target.value})}
+            className="border border-gray-300 rounded-md px-3 py-2 md:col-span-2"
+            rows={3}
+          />
+          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 md:col-span-2">
+            Add Partner
+          </button>
+        </form>
+      </div>
 
       {/* Volunteers Table */}
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Volunteer Submissions</h2>
-        <input
-          type="text"
-          placeholder="Search volunteers..."
-          value={volunteerSearch}
-          onChange={(e) => setVolunteerSearch(e.target.value)}
-          className="mb-2 px-2 py-1 border rounded w-64"
-        />
-        {filteredVolunteers.length === 0 ? (
-          <p className="text-gray-600">No volunteer submissions yet.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full border">
-              <thead>
-                <tr className="bg-gray-200 cursor-pointer">
-                  {['fullName','email','phone','interest'].map(col => (
-                    <th key={col} className="px-4 py-2 border"
-                        onClick={()=>{if (volunteerSortKey===col) setVolunteerSortAsc(!volunteerSortAsc); else {setVolunteerSortKey(col); setVolunteerSortAsc(true);}}}>
-                      {col.charAt(0).toUpperCase()+col.slice(1)}
-                      {volunteerSortKey===col?(volunteerSortAsc?' 🔼':' 🔽'):''}
-                    </th>
-                  ))}
-                  <th className="px-4 py-2 border">Actions</th>
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Volunteers ({filteredVolunteers.length})</h2>
+          <input
+            type="text"
+            placeholder="Search volunteers..."
+            value={volunteerSearch}
+            onChange={(e) => setVolunteerSearch(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 w-64"
+          />
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('fullName'); setVolunteerSortAsc(!volunteerSortAsc); }}>
+                  Name {volunteerSortKey === 'fullName' && (volunteerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('email'); setVolunteerSortAsc(!volunteerSortAsc); }}>
+                  Email {volunteerSortKey === 'email' && (volunteerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('phone'); setVolunteerSortAsc(!volunteerSortAsc); }}>
+                  Phone {volunteerSortKey === 'phone' && (volunteerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('interest'); setVolunteerSortAsc(!volunteerSortAsc); }}>
+                  Interest {volunteerSortKey === 'interest' && (volunteerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredVolunteers.map((volunteer, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="text"
+                      value={volunteer.fullName || ''}
+                      onChange={(e) => handleEditChange('volunteer', index, 'fullName', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="email"
+                      value={volunteer.email || ''}
+                      onChange={(e) => handleEditChange('volunteer', index, 'email', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="text"
+                      value={volunteer.phone || ''}
+                      onChange={(e) => handleEditChange('volunteer', index, 'phone', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="text"
+                      value={volunteer.interest || ''}
+                      onChange={(e) => handleEditChange('volunteer', index, 'interest', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleSave('volunteer', index)}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => handleDelete('volunteer', index)}
+                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredVolunteers.map((v, idx)=>(
-                  <tr key={idx} className="text-center">
-                    <td className="border px-4 py-2">
-                      <input value={v.fullName} onChange={(e)=>handleEditChange('volunteer',idx,'fullName',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2">{v.email}</td>
-                    <td className="border px-4 py-2">
-                      <input value={v.phone} onChange={(e)=>handleEditChange('volunteer',idx,'phone',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <input value={v.interest} onChange={(e)=>handleEditChange('volunteer',idx,'interest',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2 space-x-2">
-                      <button onClick={()=>handleSave('volunteer',idx)} className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition">Save</button>
-                      <button onClick={()=>handleDelete('volunteer',idx)} className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* Partners Table */}
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Partner Submissions</h2>
-        <input
-          type="text"
-          placeholder="Search partners..."
-          value={partnerSearch}
-          onChange={(e) => setPartnerSearch(e.target.value)}
-          className="mb-2 px-2 py-1 border rounded w-64"
-        />
-        {filteredPartners.length===0?(
-          <p className="text-gray-600">No partner submissions yet.</p>
-        ):(
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full border">
-              <thead>
-                <tr className="bg-gray-200 cursor-pointer">
-                  {['organization','contactPerson','email','phone','partnershipType'].map(col=>(
-                    <th key={col} className="px-4 py-2 border"
-                        onClick={()=>{if (partnerSortKey===col) setPartnerSortAsc(!partnerSortAsc); else {setPartnerSortKey(col); setPartnerSortAsc(true);}}}>
-                      {col.charAt(0).toUpperCase()+col.slice(1)}
-                      {partnerSortKey===col?(partnerSortAsc?' 🔼':' 🔽'):''}
-                    </th>
-                  ))}
-                  <th className="px-4 py-2 border">Actions</th>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Partners ({filteredPartners.length})</h2>
+          <input
+            type="text"
+            placeholder="Search partners..."
+            value={partnerSearch}
+            onChange={(e) => setPartnerSearch(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 w-64"
+          />
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('organization'); setPartnerSortAsc(!partnerSortAsc); }}>
+                  Organization {partnerSortKey === 'organization' && (partnerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('contactPerson'); setPartnerSortAsc(!partnerSortAsc); }}>
+                  Contact Person {partnerSortKey === 'contactPerson' && (partnerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('email'); setPartnerSortAsc(!partnerSortAsc); }}>
+                  Email {partnerSortKey === 'email' && (partnerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('partnershipType'); setPartnerSortAsc(!partnerSortAsc); }}>
+                  Type {partnerSortKey === 'partnershipType' && (partnerSortAsc ? '↑' : '↓')}
+                </th>
+                <th className="py-2 px-4 border-b">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPartners.map((partner, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="text"
+                      value={partner.organization || ''}
+                      onChange={(e) => handleEditChange('partner', index, 'organization', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="text"
+                      value={partner.contactPerson || ''}
+                      onChange={(e) => handleEditChange('partner', index, 'contactPerson', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="email"
+                      value={partner.email || ''}
+                      onChange={(e) => handleEditChange('partner', index, 'email', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <input
+                      type="text"
+                      value={partner.partnershipType || ''}
+                      onChange={(e) => handleEditChange('partner', index, 'partnershipType', e.target.value)}
+                      className="w-full border-none bg-transparent"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleSave('partner', index)}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => handleDelete('partner', index)}
+                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredPartners.map((p, idx)=>(
-                  <tr key={idx} className="text-center">
-                    <td className="border px-4 py-2">
-                      <input value={p.organization} onChange={(e)=>handleEditChange('partner',idx,'organization',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <input value={p.contactPerson} onChange={(e)=>handleEditChange('partner',idx,'contactPerson',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2">{p.email}</td>
-                    <td className="border px-4 py-2">
-                      <input value={p.phone} onChange={(e)=>handleEditChange('partner',idx,'phone',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <input value={p.partnershipType} onChange={(e)=>handleEditChange('partner',idx,'partnershipType',e.target.value)} className="w-full px-1 py-1 border rounded"/>
-                    </td>
-                    <td className="border px-4 py-2 space-x-2">
-                      <button onClick={()=>handleSave('partner',idx)} className="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 transition">Save</button>
-                      <button onClick={()=>handleDelete('partner',idx)} className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition">Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      {/* Upload Resources */}
-      <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Upload Resources</h2>
-        <input type="file" onChange={(e)=>setUploadFile(e.target.files?.[0]||null)} className="mb-2"/>
-        <button onClick={handleFileUpload} disabled={!uploadFile || uploading} className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">
-          {uploading ? 'Uploading...' : 'Upload'}
-        </button>
-
-        {/* Uploaded Files List */}
-        {uploadedFiles.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-xl font-semibold mb-2">Uploaded Files</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {uploadedFiles.map((file, idx) => (
-                <li key={idx} className="flex items-center justify-between">
-                  <a href={file.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    {file.name}
-                  </a>
-                  <button 
-                    onClick={() => handleDeleteFile(file.ref)}
-                    className="ml-4 bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 transition"
-                  >
-                    Delete
-                  </button>
-                </li>
               ))}
-            </ul>
-          </div>
-        )}
-      </section>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
