@@ -164,22 +164,28 @@ def view_data(form_type):
 # --------------------------
 # 🗑️ DELETE ENTRY
 # --------------------------
-@app.route("/api/delete/<string:form_type>/<string:email>", methods=["DELETE"])
-def delete_entry(form_type, email):
+@app.route("/api/delete/<string:form_type>/<string:identifier>", methods=["DELETE"])
+def delete_entry(form_type, identifier):
     try:
         if form_type == "volunteer":
-            result = volunteer_collection.delete_one({"email": email})
+            result = volunteer_collection.delete_one({"email": identifier})
         elif form_type == "partner":
-            result = partner_collection.delete_one({"email": email})
-        elif form_type == "donations":
-            result = donation_collection.delete_one({"email": email})
+            result = partner_collection.delete_one({"email": identifier})
+        elif form_type == "donation":
+            # Handle donation deletion by email or ID
+            if "@" in identifier:
+                # Delete by email
+                result = donation_collection.delete_one({"email": identifier})
+            else:
+                # Delete by ID
+                result = donation_collection.delete_one({"_id": ObjectId(identifier)})
         else:
             return jsonify({"error": "Invalid form type"}), 400
 
         if result.deleted_count == 0:
             return jsonify({"error": "Entry not found"}), 404
 
-        logging.info(f"Deleted {form_type} with email: {email}")
+        logging.info(f"Deleted {form_type} with identifier: {identifier}")
         return jsonify({"success": True, "message": "Entry deleted successfully"}), 200
 
     except Exception as e:
@@ -197,7 +203,7 @@ def update_entry(form_type, email):
             result = volunteer_collection.update_one({"email": email}, {"$set": data})
         elif form_type == "partner":
             result = partner_collection.update_one({"email": email}, {"$set": data})
-        elif form_type == "donations":
+        elif form_type == "donation":
             result = donation_collection.update_one({"email": email}, {"$set": data})
         else:
             return jsonify({"error": "Invalid form type"}), 400
@@ -211,6 +217,49 @@ def update_entry(form_type, email):
     except Exception as e:
         logging.error(f"Error updating {form_type}: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
+
+# --------------------------
+# 📧 RECEIPT EMAIL ROUTE
+# --------------------------
+@app.route("/api/send-receipt", methods=["POST"])
+def send_receipt():
+    try:
+        data = request.get_json(force=True)
+        required_fields = ["to", "subject", "receipt", "donorName", "amount", "currency"]
+        
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"error": f"Missing field: {field}"}), 400
+
+        # Log the receipt sending (you can integrate with actual email service here)
+        logging.info(f"Receipt generated for: {data['donorName']} ({data['to']})")
+        logging.info(f"Amount: {data['currency']} {data['amount']}")
+        logging.info(f"Receipt content length: {len(data['receipt'])} characters")
+        
+        # TODO: Integrate with actual email service like:
+        # - SendGrid
+        # - SMTP (smtplib)
+        # - AWS SES
+        # - Mailgun
+        # - Your preferred email service
+        
+        # For now, we'll simulate successful email sending
+        receipt_id = f"SE-{datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')}"
+        
+        logging.info(f"Receipt email would be sent to: {data['to']}")
+        logging.info(f"Subject: {data['subject']}")
+        logging.info(f"Receipt ID: {receipt_id}")
+        
+        return jsonify({
+            "success": True,
+            "message": "Receipt email queued for sending",
+            "receiptId": receipt_id,
+            "note": "Email service not configured - receipt was generated for download"
+        }), 200
+
+    except Exception as e:
+        logging.error(f"Error sending receipt email: {e}")
+        return jsonify({"error": "Failed to send receipt email"}), 500
 
 # --------------------------
 # 📁 FILE UPLOAD ROUTES

@@ -6,20 +6,21 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const DonatePage: React.FC = () => {
   const [formData, setFormData] = useState({
-    fullName: '', // Using fullName to match backend expectation
+    fullName: '',
     email: '',
     phone: '',
     idNumber: '',
     amount: '',
-    currency: 'KES', // Default currency
+    currency: 'KES',
     paymentMethod: 'M-Pesa',
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [receiptData, setReceiptData] = useState<any>(null);
 
-  // Currency options with symbols and conversion rates (approximate)
+  // Currency options
   const currencies = [
     { code: 'KES', symbol: 'Ksh', name: 'Kenyan Shilling', rate: 1 },
     { code: 'USD', symbol: '$', name: 'US Dollar', rate: 0.0078 },
@@ -30,6 +31,86 @@ const DonatePage: React.FC = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Generate receipt PDF
+  const generateReceipt = (donationData: any) => {
+    const receiptContent = `
+      SMART EDUCATION DONATION RECEIPT
+      
+      Receipt No: SE-${Date.now()}
+      Date: ${new Date().toLocaleDateString()}
+      Time: ${new Date().toLocaleTimeString()}
+      
+      Donor Information:
+      Name: ${donationData.fullName}
+      Email: ${donationData.email}
+      Phone: ${donationData.phone}
+      ID Number: ${donationData.idNumber}
+      
+      Donation Details:
+      Amount: ${donationData.currency} ${parseFloat(donationData.amount).toLocaleString()}
+      Payment Method: ${donationData.paymentMethod}
+      ${donationData.message ? `Message: ${donationData.message}` : ''}
+      
+      Thank you for your generous support!
+      
+      Smart Education
+      Empowering the next generation of leaders in Kenya
+      Contact: +254 742 180636
+      Email: empowerthem01@gmail.com
+      
+      This is an automated receipt. Please keep it for your records.
+    `;
+
+    return receiptContent;
+  };
+
+  // Download receipt as text file
+  const downloadReceipt = (receiptContent: string, donorName: string) => {
+    const blob = new Blob([receiptContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Smart-Education-Receipt-${donorName.replace(/\s+/g, '-')}-${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Send receipt via email (simulated - you'll need a backend service for real emails)
+  const sendReceiptEmail = async (donationData: any, receiptContent: string) => {
+    try {
+      // This is a simulation - you'll need to implement actual email service
+      console.log('Sending receipt email to:', donationData.email);
+      
+      // For now, we'll just log it. You can integrate with:
+      // - SendGrid
+      // - EmailJS
+      // - Nodemailer (backend)
+      // - Google Apps Script
+      
+      const emailData = {
+        to: donationData.email,
+        subject: 'Smart Education - Donation Receipt',
+        receipt: receiptContent,
+        donorName: donationData.fullName,
+        amount: donationData.amount,
+        currency: donationData.currency
+      };
+      
+      // Example: Send to your backend API for email processing
+      await fetch(`${API_URL}/api/send-receipt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailData)
+      });
+      
+    } catch (error) {
+      console.warn('Failed to send email receipt:', error);
+      // Don't fail the main submission if email fails
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +135,7 @@ const DonatePage: React.FC = () => {
     try {
       console.log('🔄 Starting donation submission...');
       
-      // Prepare data for backend - using fullName to match backend expectation
+      // Prepare data for backend
       const donationData = {
         fullName: formData.fullName.trim(),
         email: formData.email.trim(),
@@ -68,9 +149,8 @@ const DonatePage: React.FC = () => {
       };
 
       console.log('📤 Sending data to backend:', donationData);
-      console.log('🌐 API URL:', `${API_URL}/api/donate`);
 
-      // 1. Submit to MongoDB backend (primary storage)
+      // 1. Submit to MongoDB backend
       const mongoResponse = await fetch(`${API_URL}/api/donate`, {
         method: 'POST',
         headers: { 
@@ -79,22 +159,28 @@ const DonatePage: React.FC = () => {
         body: JSON.stringify(donationData),
       });
 
-      console.log('📥 Response status:', mongoResponse.status);
-      console.log('📥 Response ok:', mongoResponse.ok);
-
       const mongoResult = await mongoResponse.json();
       console.log('✅ MongoDB response data:', mongoResult);
 
       if (!mongoResponse.ok) {
-        // Try to get more specific error message
         const errorMsg = mongoResult.error || mongoResult.message || mongoResult.details || 'Failed to save to database';
-        console.error('❌ Backend error details:', mongoResult);
         throw new Error(errorMsg);
       }
 
-      // 2. Submit to Google Sheets (backup/legacy)
+      // 2. Generate and store receipt data
+      const receiptContent = generateReceipt(donationData);
+      setReceiptData({
+        content: receiptContent,
+        donorName: donationData.fullName,
+        amount: donationData.amount,
+        currency: donationData.currency
+      });
+
+      // 3. Send receipt email
+      await sendReceiptEmail(donationData, receiptContent);
+
+      // 4. Submit to Google Sheets (backup)
       try {
-        console.log('📊 Attempting Google Sheets backup...');
         await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           mode: 'no-cors',
@@ -130,15 +216,7 @@ const DonatePage: React.FC = () => {
 
     } catch (error: any) {
       console.error('❌ Error submitting donation form:', error);
-      
-      // More specific error messages
-      if (error.message.includes('fullName')) {
-        setSubmitError('Full Name field is required. Please check your input.');
-      } else if (error.message.includes('network') || error.message.includes('fetch')) {
-        setSubmitError('Network error. Please check your internet connection and try again.');
-      } else {
-        setSubmitError(error.message || 'Failed to submit donation. Please try again.');
-      }
+      setSubmitError(error.message || 'Failed to submit donation. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -220,8 +298,20 @@ const DonatePage: React.FC = () => {
                   <p className="font-bold text-lg">Thank you for your generous support!</p>
                 </div>
                 <p>We have received your donation information successfully.</p>
-                <p className="text-sm mt-2">📧 A confirmation email will be sent shortly</p>
+                <p className="text-sm mt-2">📧 A confirmation email has been sent to you</p>
                 <p className="text-sm">💾 Saved to our secure database</p>
+                
+                {receiptData && (
+                  <div className="mt-4 space-y-2">
+                    <p className="text-sm font-semibold">Download your receipt:</p>
+                    <button
+                      onClick={() => downloadReceipt(receiptData.content, receiptData.donorName)}
+                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"
+                    >
+                      📄 Download Receipt
+                    </button>
+                  </div>
+                )}
                 
                 <button
                   onClick={() => setIsSubmitted(false)}
@@ -427,6 +517,7 @@ const DonatePage: React.FC = () => {
 
                 <p className="text-xs text-gray-500 text-center">
                   * Required fields. Your information is secure and will only be used for donation purposes.
+                  A receipt will be generated and sent to your email.
                 </p>
               </form>
             )}

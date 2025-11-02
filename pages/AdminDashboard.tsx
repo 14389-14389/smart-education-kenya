@@ -27,12 +27,16 @@ const AdminDashboard: React.FC = () => {
 
   const [volunteerSearch, setVolunteerSearch] = useState('');
   const [partnerSearch, setPartnerSearch] = useState('');
+  const [donationSearch, setDonationSearch] = useState('');
 
   const [volunteerSortKey, setVolunteerSortKey] = useState<string>('fullName');
   const [volunteerSortAsc, setVolunteerSortAsc] = useState(true);
 
   const [partnerSortKey, setPartnerSortKey] = useState<string>('organization');
   const [partnerSortAsc, setPartnerSortAsc] = useState(true);
+
+  const [donationSortKey, setDonationSortKey] = useState<string>('createdAt');
+  const [donationSortAsc, setDonationSortAsc] = useState(true);
 
   const [newVolunteer, setNewVolunteer] = useState({
     fullName: '', email: '', phone: '', interest: '', message: ''
@@ -46,6 +50,47 @@ const AdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const correctPassword = 'smart123';
+
+  // -----------------
+  // Download Functions
+  // -----------------
+  const downloadCSV = (data: any[], filename: string, headers: string[]) => {
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => 
+        headers.map(header => {
+          const value = row[header] || '';
+          // Escape quotes and wrap in quotes if contains comma
+          return `"${String(value).replace(/"/g, '""')}"`;
+        }).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadVolunteers = () => {
+    const headers = ['fullName', 'email', 'phone', 'interest', 'message', 'createdAt'];
+    downloadCSV(volunteers, `volunteers-${new Date().toISOString().split('T')[0]}.csv`, headers);
+  };
+
+  const downloadPartners = () => {
+    const headers = ['organization', 'contactPerson', 'email', 'phone', 'partnershipType', 'message', 'createdAt'];
+    downloadCSV(partners, `partners-${new Date().toISOString().split('T')[0]}.csv`, headers);
+  };
+
+  const downloadDonations = () => {
+    const headers = ['fullName', 'email', 'phone', 'idNumber', 'amount', 'currency', 'paymentMethod', 'message', 'timestamp'];
+    downloadCSV(donations, `donations-${new Date().toISOString().split('T')[0]}.csv`, headers);
+  };
 
   // -----------------
   // Health Check
@@ -94,7 +139,7 @@ const AdminDashboard: React.FC = () => {
     if (authenticated) {
       fetchVolunteers();
       fetchPartners();
-      fetchDonations(); // Add this
+      fetchDonations();
       fetchUploadedFiles();
       checkHealth();
     }
@@ -168,10 +213,41 @@ const AdminDashboard: React.FC = () => {
 
   const fetchDonations = async () => {
     try {
+      setLoading(true);
+      console.log('🔍 Fetching donations from:', `${API_URL}/api/view/donations`);
+      
       const res = await axios.get(`${API_URL}/api/view/donations`);
-      setDonations(res.data.data);
-    } catch (err) {
-      console.error('Error fetching donations:', err);
+      console.log('📊 Donations API response:', res.data);
+      
+      if (res.data && res.data.data) {
+        console.log(`✅ Loaded ${res.data.data.length} donations`);
+        
+        // Check what we're actually getting
+        if (res.data.data.length > 0) {
+          console.log('📊 First donation item:', res.data.data[0]);
+          console.log('📊 Available keys:', Object.keys(res.data.data[0]));
+        }
+        
+        setDonations(res.data.data);
+      } else {
+        console.log('❌ No donations data found in response');
+        console.log('Full response:', res.data);
+        setDonations([]);
+      }
+    } catch (err: any) {
+      console.error('❌ Error fetching donations:', err);
+      console.error('Error status:', err.response?.status);
+      console.error('Error data:', err.response?.data);
+      
+      if (err.response?.status === 404) {
+        alert('Donations API endpoint not found. Please check backend routes.');
+      } else if (err.response?.status === 500) {
+        alert('Server error when fetching donations. Check backend logs.');
+      } else {
+        alert('Network error when fetching donations. Check connection.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -216,17 +292,36 @@ const AdminDashboard: React.FC = () => {
   // -----------------
   // Delete entry
   // -----------------
-  const handleDelete = async (formType: 'volunteer' | 'partner', index: number) => {
-    const item = formType === 'volunteer' ? volunteers[index] : partners[index];
-    if (!window.confirm(`Are you sure you want to delete this ${formType}?`)) return;
+  const handleDelete = async (formType: 'volunteer' | 'partner' | 'donation', index: number) => {
+    let item, itemName;
+    
+    if (formType === 'volunteer') {
+      item = volunteers[index];
+      itemName = `${item.fullName} (${item.email})`;
+    } else if (formType === 'partner') {
+      item = partners[index];
+      itemName = `${item.organization} (${item.email})`;
+    } else {
+      item = donations[index];
+      itemName = `${item.fullName || item.name || 'Unknown'} - ${item.amount} ${item.currency || 'KES'}`;
+    }
+    
+    if (!window.confirm(`Are you sure you want to delete this ${formType}?\n${itemName}`)) return;
 
     try {
-      await axios.delete(`${API_URL}/api/delete/${formType}/${item.email}`);
-      formType === 'volunteer' ? fetchVolunteers() : fetchPartners();
+      if (formType === 'donation') {
+        // Delete donation by ID or email
+        const identifier = item._id || item.id || item.email;
+        await axios.delete(`${API_URL}/api/delete/donation/${identifier}`);
+        fetchDonations();
+      } else {
+        await axios.delete(`${API_URL}/api/delete/${formType}/${item.email}`);
+        formType === 'volunteer' ? fetchVolunteers() : fetchPartners();
+      }
       alert('Deleted successfully!');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error deleting entry:', err);
-      alert('Deletion failed!');
+      alert(`Deletion failed! ${err.response?.data?.error || err.message}`);
     }
   };
 
@@ -316,6 +411,22 @@ const AdminDashboard: React.FC = () => {
     return [...data].sort((a, b) => {
       if (!a[key]) return 1;
       if (!b[key]) return -1;
+      
+      // Handle date sorting
+      if (key.includes('date') || key.includes('Date') || key === 'createdAt' || key === 'timestamp') {
+        const dateA = new Date(a[key]).getTime();
+        const dateB = new Date(b[key]).getTime();
+        return asc ? dateA - dateB : dateB - dateA;
+      }
+      
+      // Handle number sorting
+      if (key === 'amount') {
+        const numA = parseFloat(a[key]) || 0;
+        const numB = parseFloat(b[key]) || 0;
+        return asc ? numA - numB : numB - numA;
+      }
+      
+      // Default string sorting
       return asc
         ? a[key].toString().localeCompare(b[key].toString())
         : b[key].toString().localeCompare(a[key].toString());
@@ -368,9 +479,27 @@ const AdminDashboard: React.FC = () => {
     partnerSortAsc
   );
 
+  const filteredDonations = sortData(
+    donations.filter(d =>
+      (d.fullName?.toLowerCase().includes(donationSearch.toLowerCase()) ||
+      d.name?.toLowerCase().includes(donationSearch.toLowerCase()) ||
+      d.email?.toLowerCase().includes(donationSearch.toLowerCase()) ||
+      d.amount?.toString().includes(donationSearch.toLowerCase()) ||
+      d.paymentMethod?.toLowerCase().includes(donationSearch.toLowerCase()))
+    ),
+    donationSortKey,
+    donationSortAsc
+  );
+
+  // Calculate total donations
+  const totalDonations = donations.reduce((sum, donation) => {
+    const amount = parseFloat(donation.amount) || 0;
+    return sum + amount;
+  }, 0);
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center"><i><b>Admin Dashboard</b></i></h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Admin Dashboard - Live</h1>
       
       {/* Health Status */}
       {healthStatus && (
@@ -592,13 +721,21 @@ const AdminDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Volunteers ({filteredVolunteers.length})</h2>
-          <input
-            type="text"
-            placeholder="Search volunteers..."
-            value={volunteerSearch}
-            onChange={(e) => setVolunteerSearch(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 w-64"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search volunteers..."
+              value={volunteerSearch}
+              onChange={(e) => setVolunteerSearch(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-64"
+            />
+            <button
+              onClick={downloadVolunteers}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+            >
+              📥 Download CSV
+            </button>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
@@ -681,13 +818,21 @@ const AdminDashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Partners ({filteredPartners.length})</h2>
-          <input
-            type="text"
-            placeholder="Search partners..."
-            value={partnerSearch}
-            onChange={(e) => setPartnerSearch(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 w-64"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search partners..."
+              value={partnerSearch}
+              onChange={(e) => setPartnerSearch(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-64"
+            />
+            <button
+              onClick={downloadPartners}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+            >
+              📥 Download CSV
+            </button>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
@@ -766,35 +911,90 @@ const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Donations Table - You can add this section */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      {/* Donations Table */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Donations ({donations.length})</h2>
+          <div>
+            <h2 className="text-xl font-semibold">Donations ({filteredDonations.length})</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Total Amount: <span className="font-bold text-green-600">Ksh {totalDonations.toLocaleString()}</span>
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search donations..."
+              value={donationSearch}
+              onChange={(e) => setDonationSearch(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-64"
+            />
+            <button
+              onClick={downloadDonations}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+            >
+              📥 Download CSV
+            </button>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b">Name</th>
-                <th className="py-2 px-4 border-b">Email</th>
-                <th className="py-2 px-4 border-b">Amount</th>
-                <th className="py-2 px-4 border-b">Message</th>
-                <th className="py-2 px-4 border-b">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {donations.map((donation, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">{donation.name || 'N/A'}</td>
-                  <td className="py-2 px-4 border-b">{donation.email || 'N/A'}</td>
-                  <td className="py-2 px-4 border-b">${donation.amount || '0'}</td>
-                  <td className="py-2 px-4 border-b">{donation.message || 'No message'}</td>
-                  <td className="py-2 px-4 border-b">{donation.createdAt ? new Date(donation.createdAt).toLocaleDateString() : 'N/A'}</td>
+        
+        {filteredDonations.length === 0 ? (
+          <p className="text-gray-500 text-center py-4">No donations found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('fullName'); setDonationSortAsc(!donationSortAsc); }}>
+                    Donor Name {donationSortKey === 'fullName' && (donationSortAsc ? '↑' : '↓')}
+                  </th>
+                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('email'); setDonationSortAsc(!donationSortAsc); }}>
+                    Email {donationSortKey === 'email' && (donationSortAsc ? '↑' : '↓')}
+                  </th>
+                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('amount'); setDonationSortAsc(!donationSortAsc); }}>
+                    Amount {donationSortKey === 'amount' && (donationSortAsc ? '↑' : '↓')}
+                  </th>
+                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('paymentMethod'); setDonationSortAsc(!donationSortAsc); }}>
+                    Method {donationSortKey === 'paymentMethod' && (donationSortAsc ? '↑' : '↓')}
+                  </th>
+                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('timestamp'); setDonationSortAsc(!donationSortAsc); }}>
+                    Date {donationSortKey === 'timestamp' && (donationSortAsc ? '↑' : '↓')}
+                  </th>
+                  <th className="py-2 px-4 border-b">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredDonations.map((donation, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="py-2 px-4 border-b">
+                      {donation.fullName || donation.name || 'N/A'}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {donation.email || 'N/A'}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {donation.currency || 'KES'} {parseFloat(donation.amount || 0).toLocaleString()}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {donation.paymentMethod || 'N/A'}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      {donation.timestamp ? new Date(donation.timestamp).toLocaleDateString() : 
+                       donation.createdAt ? new Date(donation.createdAt).toLocaleDateString() : 'N/A'}
+                    </td>
+                    <td className="py-2 px-4 border-b">
+                      <button
+                        onClick={() => handleDelete('donation', index)}
+                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
