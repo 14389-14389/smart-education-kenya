@@ -1,66 +1,62 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Education - Maintenance</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      color: #333;
-      text-align: center;
-      padding: 100px 20px;
-    }
-    h1 {
-      font-size: 2.5em;
-      color: #0078d7;
-    }
-    #countdown {
-      font-size: 2em;
-      margin-top: 30px;
-      color: #222;
-    }
-    footer {
-      margin-top: 80px;
-      color: #777;
-    }
-  </style>
-</head>
-<body>
-  <h1>🚧 Smart Education is Under Maintenance 🚧</h1>
-  <p>We’re making improvements to serve you better.<br>
-  The site will be back online in:</p>
-  <div id="countdown"></div>
-
-  <footer>
-    &copy; <span id="year"></span> SmartEducation.co.ke — All Rights Reserved
-  </footer>
-
-  <script>
-    // Set countdown to 7 days from now
-    const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 7);
-
-    const timer = setInterval(function() {
-      const now = new Date().getTime();
-      const distance = launchDate - now;
-
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-      document.getElementById("countdown").innerHTML =
-        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-
-      if (distance < 0) {
-        clearInterval(timer);
-        document.getElementById("countdown").innerHTML = "We're back online!";
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Education – Maintenance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #0284c7, #0ea5e9);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
       }
-    }, 1000);
+      .countdown {
+        font-size: 2rem;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="text-4xl font-bold mb-4">🚧 Smart Education is Under Maintenance 🚧</h1>
+    <p class="text-lg">We’ll be back soon — thank you for your patience!</p>
 
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
-</body>
+    <div class="countdown" id="countdown"></div>
+
+    <script>
+      // Set countdown for 7 days from now
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 7);
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance <= 0) {
+          document.getElementById("countdown").innerHTML =
+            "✅ We're back online!";
+          clearInterval(interval);
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML =
+          `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+
+      const interval = setInterval(updateCountdown, 1000);
+      updateCountdown();
+    </script>
+  </body>
 </html>
