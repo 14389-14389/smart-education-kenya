@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>Site Under Maintenance</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 10%; background: #f2f2f2; color: #333; }
+    h1 { font-size: 2.5em; color: #0078D7; }
+    p { font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>We'll Be Back Soon</h1>
+  <p>SmartEducation.co.ke is currently undergoing scheduled maintenance.<br>
+  Please check back later.</p>
+</body>
+</html>

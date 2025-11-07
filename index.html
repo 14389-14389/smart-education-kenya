@@ -1,7 +1,39 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta http-equiv="refresh" content="0; url=maintenance.html" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Education — Redirecting</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 20%;
+        background-color: #f0f9ff;
+        color: #0369a1;
+      }
+      .timer {
+        font-size: 2rem;
+        font-weight: bold;
+      }
+    </style>
+    <script>
+      let seconds = 7;
+      function countdown() {
+        document.getElementById("timer").textContent = seconds;
+        if (seconds <= 0) {
+          window.location.href = "maintenance.html";
+        } else {
+          seconds--;
+          setTimeout(countdown, 1000);
+        }
+      }
+      window.onload = countdown;
+    </script>
   </head>
-  <body></body>
+  <body>
+    <h1>Smart Education</h1>
+    <p>Redirecting to maintenance page in <span id="timer">7</span> seconds...</p>
+    <p>If not redirected, <a href="maintenance.html">click here</a>.</p>
+  </body>
 </html>
