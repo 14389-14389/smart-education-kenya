@@ -2,38 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-store" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Education — Redirecting</title>
+    <title>Redirecting to Maintenance...</title>
+    <script>
+      // Countdown in seconds
+      let seconds = 10;
+
+      function countdown() {
+        const counter = document.getElementById("countdown");
+        counter.textContent = seconds;
+        if (seconds > 0) {
+          seconds--;
+          setTimeout(countdown, 1000);
+        } else {
+          // Redirect to maintenance page after countdown ends
+          window.location.href = "maintenance.html";
+        }
+      }
+
+      window.onload = countdown;
+    </script>
+
+    <!-- ✅ Simple styling -->
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: "Poppins", sans-serif;
+        background-color: #f9fafb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
         text-align: center;
-        margin-top: 20%;
-        background-color: #f0f9ff;
-        color: #0369a1;
       }
-      .timer {
+      .box {
+        background: white;
+        padding: 30px 50px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #0ea5e9;
+      }
+      #countdown {
         font-size: 2rem;
+        color: #0369a1;
         font-weight: bold;
       }
     </style>
-    <script>
-      let seconds = 7;
-      function countdown() {
-        document.getElementById("timer").textContent = seconds;
-        if (seconds <= 0) {
-          window.location.href = "maintenance.html";
-        } else {
-          seconds--;
-          setTimeout(countdown, 1000);
-        }
-      }
-      window.onload = countdown;
-    </script>
   </head>
+
   <body>
-    <h1>Smart Education</h1>
-    <p>Redirecting to maintenance page in <span id="timer">7</span> seconds...</p>
-    <p>If not redirected, <a href="maintenance.html">click here</a>.</p>
+    <div class="box">
+      <h1>🚧 Smart Education</h1>
+      <p>You will be redirected to the maintenance page in</p>
+      <p><span id="countdown">10</span> seconds...</p>
+    </div>
   </body>
 </html>

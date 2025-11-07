@@ -31,6 +31,7 @@
     <div class="countdown" id="countdown"></div>
 
     <script>
+      // Set countdown for 7 days from now
       const targetDate = new Date();
       targetDate.setDate(targetDate.getDate() + 7);
 
@@ -39,9 +40,13 @@
         const distance = targetDate - now;
 
         if (distance <= 0) {
-          document.getElementById("countdown").innerHTML =
-            "✅ We're back online!";
+          document.getElementById("countdown").innerHTML = "✅ We're back online!";
           clearInterval(interval);
+
+          // Redirect to the main website after 3 seconds
+          setTimeout(() => {
+            window.location.href = "index-original.html";
+          }, 3000);
           return;
         }
 
