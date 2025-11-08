@@ -255,9 +255,9 @@ const DonatePage: React.FC = () => {
             </h2>
             <div className="space-y-6">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-lg font-semibold text-gray-800 mb-2">📱 M-Pesa (Send Money)</p>
-                <p className="text-xl font-bold text-bright-blue-700">+254 742 180636</p>
-                <p className="text-sm text-gray-600 mt-1">Name: Lucky Kitonyi</p>
+                <p className="text-lg font-semibold text-gray-800 mb-2">📱 M-Pesa (Till number)</p>
+                <p className="text-xl font-bold text-bright-blue-700">3311202</p>
+                <p className="text-sm text-gray-600 mt-1">Name: Kevin Muli</p>
               </div>
               <div className="text-center p-4 bg-yellow-50 rounded-lg">
                 <p className="text-lg font-semibold text-gray-800 mb-2">💳 PayPal</p>
