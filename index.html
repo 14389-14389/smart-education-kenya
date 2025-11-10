@@ -109,6 +109,56 @@
             font-size: 0.95rem;
         }
         
+        .legal-section {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        
+        .legal-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #be123c;
+            font-weight: 600;
+        }
+        
+        .legal-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .legal-content {
+            color: #be123c;
+            font-size: 0.95rem;
+        }
+        
+        .law-reference {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .law-section {
+            font-weight: bold;
+            color: #0369a1;
+            margin-bottom: 8px;
+        }
+        
+        .law-penalty {
+            background: #fef3cd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-style: italic;
+        }
+        
         .rules-section {
             background: #f8fafc;
             border-radius: 15px;
@@ -270,6 +320,11 @@
             .rules-section, .contact-info {
                 padding: 20px 15px;
             }
+            
+            .law-reference {
+                font-size: 0.8rem;
+                padding: 12px;
+            }
         }
     </style>
 </head>
@@ -295,6 +350,41 @@
                 </div>
             </div>
             
+            <div class="legal-section">
+                <div class="legal-title">
+                    <i class="fas fa-gavel"></i>
+                    Legal Notice Under Kenyan Cybercrime Act
+                </div>
+                <div class="legal-content">
+                    Unauthorized access and misuse of digital platforms violates the Computer Misuse and Cybercrimes Act, 2018. The following sections apply:
+                    
+                    <div class="law-reference">
+                        <div class="law-section">SECTION 16 — UNAUTHORIZED ACCESS</div>
+                        "A person who knowingly and intentionally accesses a computer system without authorization or in excess of authorization, commits an offence and shall be liable on conviction to a fine not exceeding five million shillings or to imprisonment for a term not exceeding three years, or to both."
+                    </div>
+                    
+                    <div class="law-reference">
+                        <div class="law-section">SECTION 17 — UNAUTHORIZED INTERFERENCE</div>
+                        "A person who, without authority, interferes with data or a computer system with the intent to hinder or obstruct the functioning of the computer system, commits an offence and shall be liable on conviction to a fine not exceeding ten million shillings or to imprisonment for a term not exceeding five years, or to both."
+                    </div>
+                    
+                    <div class="law-reference">
+                        <div class="law-section">SECTION 19 — UNAUTHORIZED INTERCEPTION</div>
+                        "A person who, without authority, intercepts by technical means, transmissions of data to, from or within a computer system, including electromagnetic emissions from a computer system carrying such data, commits an offence and shall be liable on conviction to a fine not exceeding ten million shillings or to imprisonment for a term not exceeding five years, or to both."
+                    </div>
+                    
+                    <div class="law-reference">
+                        <div class="law-section">SECTION 22 — FALSE REPRESENTATION</div>
+                        "A person who, without authority, makes a false representation through a computer system to another person with intent to secure a benefit for himself or another person or to cause loss to another person, commits an offence and shall be liable on conviction to a fine not exceeding five million shillings or to imprisonment for a term not exceeding three years, or to both."
+                    </div>
+                    
+                    <div class="law-reference">
+                        <div class="law-section">SECTION 23 — UNAUTHORIZED DISCLOSURE OF PASSWORD</div>
+                        "A person who, without authority, discloses a password, access code or any other means of gaining access to a computer system with intent to defeat the security measures of a computer system, commits an offence and shall be liable on conviction to a fine not exceeding five million shillings or to imprisonment for a term not exceeding three years, or to both."
+                    </div>
+                </div>
+            </div>
+            
             <div class="rules-section">
                 <h3 class="section-title">Our Platform Rules & Policies</h3>
                 
@@ -306,8 +396,8 @@
                         <div class="rule-text">
                             <div class="rule-title">No Unauthorized Political Use</div>
                             <div class="rule-description">
-                                Our platform is strictly for educational purposes. Any political use without explicit written consent is prohibited.
-                            </div>
+                                Our platform is strictly for educational purposes. Any political use without explicit written consent is prohibited and violates Sections 16 & 22 of the Computer Misuse and Cybercrimes Act, 2018.
+                            </div>  
                         </div>
                     </li>
                     
@@ -318,7 +408,7 @@
                         <div class="rule-text">
                             <div class="rule-title">Account Security</div>
                             <div class="rule-description">
-                                Users must not share login credentials or allow unauthorized access to their accounts.
+                                Users must not share login credentials or allow unauthorized access to their accounts. Such actions constitute offenses under Sections 16 & 23 of the Computer Misuse and Cybercrimes Act, 2018.
                             </div>
                         </div>
                     </li>
@@ -330,7 +420,7 @@
                         <div class="rule-text">
                             <div class="rule-title">Legal Compliance</div>
                             <div class="rule-description">
-                                All platform use must comply with Kenyan laws and regulations regarding digital platforms and educational services.
+                                All platform use must comply with Kenyan laws including the Computer Misuse and Cybercrimes Act, 2018, Data Protection Act, 2019, and other relevant legislation.
                             </div>
                         </div>
                     </li>
@@ -342,7 +432,7 @@
                         <div class="rule-text">
                             <div class="rule-title">Reporting Misuse</div>
                             <div class="rule-description">
-                                Please report any suspicious or unauthorized activities immediately to the administrator.
+                                Please report any suspicious or unauthorized activities immediately to the administrator. Legal action will be pursued against violators as provided under Kenyan law.
                             </div>
                         </div>
                     </li>
@@ -403,7 +493,7 @@
             </div>
             
             <div class="footer">
-                <p>We appreciate your understanding as we work to resolve this matter</p>
+                <p>We appreciate your understanding as we work to resolve this matter in compliance with Kenyan law</p>
             </div>
         </div>
     </div>
