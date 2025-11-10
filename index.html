@@ -1,86 +1,63 @@
-﻿
-
-
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <meta name="google-site-verification" content="2hYydOarJhZRYRZXJUNAXilXccsi-PiuxLhgOX_UdS4" />
-    <title>Smart Education</title>
-
-    <!-- ✅ TailwindCSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- ✅ Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- ✅ Tailwind Custom Config -->
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Redirecting to Maintenance...</title>
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Poppins', 'sans-serif'],
-              body: ['Roboto', 'sans-serif'],
-            },
-            colors: {
-              'bright-blue': {
-                50: '#f0f8ff',
-                100: '#e0f2fe',
-                200: '#bae6fd',
-                300: '#7dd3fc',
-                400: '#38bdf8',
-                500: '#0ea5e9',
-                600: '#0284c7',
-                700: '#0369a1',
-                800: '#075985',
-                900: '#0c4a6e',
-              },
-            },
-            keyframes: {
-              slideDown: {
-                '0%': { transform: 'translateY(-100%)' },
-                '100%': { transform: 'translateY(0)' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(0)' },
-                '100%': { transform: 'translateY(-100%)' },
-              },
-            },
-            animation: {
-              slideDown: 'slideDown 0.4s ease-out forwards',
-              slideUp: 'slideUp 0.4s ease-in forwards',
-            },
-          },
-        },
-      };
+      // Countdown in seconds
+      let seconds = 10;
+
+      function countdown() {
+        const counter = document.getElementById("countdown");
+        counter.textContent = seconds;
+        if (seconds > 0) {
+          seconds--;
+          setTimeout(countdown, 1000);
+        } else {
+          // Redirect to maintenance page after countdown ends
+          window.location.href = "maintenance.html";
+        }
+      }
+
+      window.onload = countdown;
     </script>
 
-    <!-- ✅ Import maps for React -->
-    <script type="importmap">
-    {
-      "imports": {
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
-        "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.3"
+    <!-- ✅ Simple styling -->
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f9fafb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        text-align: center;
       }
-    }
-    </script>
+      .box {
+        background: white;
+        padding: 30px 50px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #0ea5e9;
+      }
+      #countdown {
+        font-size: 2rem;
+        color: #0369a1;
+        font-weight: bold;
+      }
+    </style>
   </head>
 
-  <body class="antialiased font-body bg-white">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+  <body>
+    <div class="box">
+      <h1>🚧 Smart Education</h1>
+      <p>You will be redirected to the maintenance page in</p>
+      <p><span id="countdown">10</span> seconds...</p>
+    </div>
   </body>
 </html>
