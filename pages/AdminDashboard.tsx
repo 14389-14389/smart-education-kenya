@@ -4,11 +4,13 @@ import axios from 'axios';
 // -----------------
 // Base API URL
 // -----------------
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'https://smart-education-kenya.onrender.com';
 
 const AdminDashboard: React.FC = () => {
   const [password, setPassword] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [volunteers, setVolunteers] = useState<any[]>([]);
   const [partners, setPartners] = useState<any[]>([]);
@@ -49,8 +51,16 @@ const AdminDashboard: React.FC = () => {
   const [healthStatus, setHealthStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // CORRECTED: Using environment variable for password
- const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'Alfaromeo001@';
+  // TEMPORARY FIX: Hardcoded password for Netlify
+  const correctPassword = 'Alfaromeo001@';
+
+  // Debug Netlify environment
+  useEffect(() => {
+    console.log('🔐 Netlify Environment Status:');
+    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL || 'Not set');
+    console.log('VITE_ADMIN_PASSWORD:', import.meta.env.VITE_ADMIN_PASSWORD ? 'Set' : 'Not set');
+    console.log('Using password:', correctPassword);
+  }, []);
 
   // -----------------
   // Download Functions
@@ -61,7 +71,6 @@ const AdminDashboard: React.FC = () => {
       ...data.map(row => 
         headers.map(header => {
           const value = row[header] || '';
-          // Escape quotes and wrap in quotes if contains comma
           return `"${String(value).replace(/"/g, '""')}"`;
         }).join(',')
       )
@@ -149,31 +158,15 @@ const AdminDashboard: React.FC = () => {
   const fetchVolunteers = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching volunteers from:', `${API_URL}/api/view/volunteer`);
-      
       const res = await axios.get(`${API_URL}/api/view/volunteer`);
-      console.log('📊 Volunteers API response:', res.data);
-      
       if (res.data && res.data.data) {
-        console.log(`✅ Loaded ${res.data.data.length} volunteers`);
         setVolunteers(res.data.data);
       } else {
-        console.log('❌ No volunteers data found in response');
-        console.log('Full response:', res.data);
         setVolunteers([]);
       }
     } catch (err: any) {
       console.error('❌ Error fetching volunteers:', err);
-      console.error('Error status:', err.response?.status);
-      console.error('Error data:', err.response?.data);
-      
-      if (err.response?.status === 404) {
-        alert('Volunteers API endpoint not found. Please check backend routes.');
-      } else if (err.response?.status === 500) {
-        alert('Server error when fetching volunteers. Check backend logs.');
-      } else {
-        alert('Network error when fetching volunteers. Check connection.');
-      }
+      alert('Error fetching volunteers! Check console for details.');
     } finally {
       setLoading(false);
     }
@@ -182,31 +175,15 @@ const AdminDashboard: React.FC = () => {
   const fetchPartners = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching partners from:', `${API_URL}/api/view/partner`);
-      
       const res = await axios.get(`${API_URL}/api/view/partner`);
-      console.log('📊 Partners API response:', res.data);
-      
       if (res.data && res.data.data) {
-        console.log(`✅ Loaded ${res.data.data.length} partners`);
         setPartners(res.data.data);
       } else {
-        console.log('❌ No partners data found in response');
-        console.log('Full response:', res.data);
         setPartners([]);
       }
     } catch (err: any) {
       console.error('❌ Error fetching partners:', err);
-      console.error('Error status:', err.response?.status);
-      console.error('Error data:', err.response?.data);
-      
-      if (err.response?.status === 404) {
-        alert('Partners API endpoint not found. Please check backend routes.');
-      } else if (err.response?.status === 500) {
-        alert('Server error when fetching partners. Check backend logs.');
-      } else {
-        alert('Network error when fetching partners. Check connection.');
-      }
+      alert('Error fetching partners! Check console for details.');
     } finally {
       setLoading(false);
     }
@@ -215,38 +192,15 @@ const AdminDashboard: React.FC = () => {
   const fetchDonations = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching donations from:', `${API_URL}/api/view/donations`);
-      
       const res = await axios.get(`${API_URL}/api/view/donations`);
-      console.log('📊 Donations API response:', res.data);
-      
       if (res.data && res.data.data) {
-        console.log(`✅ Loaded ${res.data.data.length} donations`);
-        
-        // Check what we're actually getting
-        if (res.data.data.length > 0) {
-          console.log('📊 First donation item:', res.data.data[0]);
-          console.log('📊 Available keys:', Object.keys(res.data.data[0]));
-        }
-        
         setDonations(res.data.data);
       } else {
-        console.log('❌ No donations data found in response');
-        console.log('Full response:', res.data);
         setDonations([]);
       }
     } catch (err: any) {
       console.error('❌ Error fetching donations:', err);
-      console.error('Error status:', err.response?.status);
-      console.error('Error data:', err.response?.data);
-      
-      if (err.response?.status === 404) {
-        alert('Donations API endpoint not found. Please check backend routes.');
-      } else if (err.response?.status === 500) {
-        alert('Server error when fetching donations. Check backend logs.');
-      } else {
-        alert('Network error when fetching donations. Check connection.');
-      }
+      alert('Error fetching donations! Check console for details.');
     } finally {
       setLoading(false);
     }
@@ -311,7 +265,6 @@ const AdminDashboard: React.FC = () => {
 
     try {
       if (formType === 'donation') {
-        // Delete donation by ID or email
         const identifier = item._id || item.id || item.email;
         await axios.delete(`${API_URL}/api/delete/donation/${identifier}`);
         fetchDonations();
@@ -366,8 +319,6 @@ const AdminDashboard: React.FC = () => {
       const formData = new FormData();
       formData.append('file', uploadFile);
 
-      console.log('Uploading file:', uploadFile.name, 'Size:', uploadFile.size);
-      
       const response = await axios.post(`${API_URL}/api/upload`, formData, {
         headers: { 
           'Content-Type': 'multipart/form-data'
@@ -375,8 +326,6 @@ const AdminDashboard: React.FC = () => {
         timeout: 30000
       });
 
-      console.log('Upload response:', response.data);
-      
       if (response.data.success) {
         alert('File uploaded successfully!');
         setUploadFile(null);
@@ -386,7 +335,6 @@ const AdminDashboard: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Upload error:', err);
-      console.error('Error response:', err.response?.data);
       alert('Upload failed: ' + (err.response?.data?.error || err.message || 'Network error'));
     } finally {
       setUploading(false);
@@ -413,53 +361,30 @@ const AdminDashboard: React.FC = () => {
       if (!a[key]) return 1;
       if (!b[key]) return -1;
       
-      // Handle date sorting
       if (key.includes('date') || key.includes('Date') || key === 'createdAt' || key === 'timestamp') {
         const dateA = new Date(a[key]).getTime();
         const dateB = new Date(b[key]).getTime();
         return asc ? dateA - dateB : dateB - dateA;
       }
       
-      // Handle number sorting
       if (key === 'amount') {
         const numA = parseFloat(a[key]) || 0;
         const numB = parseFloat(b[key]) || 0;
         return asc ? numA - numB : numB - numA;
       }
       
-      // Default string sorting
       return asc
         ? a[key].toString().localeCompare(b[key].toString())
         : b[key].toString().localeCompare(a[key].toString());
     });
   };
 
-  // -----------------
-  // Login View
-  // -----------------
-  if (!authenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-2xl font-bold mb-4 text-gray-700">Admin Login</h1>
-        <form onSubmit={handleLogin} className="bg-white shadow-md rounded-lg p-6 w-80">
-          <input
-            type="password"
-            placeholder="Enter admin password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition">
-            Login
-          </button>
-        </form>
-      </div>
-    );
-  }
+  // Calculate statistics
+  const totalDonations = donations.reduce((sum, donation) => {
+    const amount = parseFloat(donation.amount) || 0;
+    return sum + amount;
+  }, 0);
 
-  // -----------------
-  // Admin Dashboard View
-  // -----------------
   const filteredVolunteers = sortData(
     volunteers.filter(v =>
       v.fullName?.toLowerCase().includes(volunteerSearch.toLowerCase()) ||
@@ -492,511 +417,661 @@ const AdminDashboard: React.FC = () => {
     donationSortAsc
   );
 
-  // Calculate total donations
-  const totalDonations = donations.reduce((sum, donation) => {
-    const amount = parseFloat(donation.amount) || 0;
-    return sum + amount;
-  }, 0);
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">Admin Dashboard - Live</h1>
-      
-      {/* Health Status */}
-      {healthStatus && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-lg font-semibold">🏥 System Health</h3>
-            <button 
-              onClick={checkHealth}
-              className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
-            >
-              Refresh Health
-            </button>
-          </div>
-          
-          {healthStatus.error ? (
-            <div className="text-red-600">Health check failed: {healthStatus.error}</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className={`p-2 rounded ${healthStatus.collections?.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
-                <strong>Database:</strong> {healthStatus.collections?.status || 'unknown'}
-                <br/>
-                Volunteers Collection: {healthStatus.collections?.has_volunteers_collection ? '✅' : '❌'}
-                <br/>
-                Partners Collection: {healthStatus.collections?.has_partners_collection ? '✅' : '❌'}
+  // -----------------
+  // Login View
+  // -----------------
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
               </div>
+              <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+              <p className="text-gray-600 mt-2">Enter your password to continue</p>
               
-              <div className={`p-2 rounded ${healthStatus.volunteers?.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
-                <strong>Volunteers:</strong> {healthStatus.volunteers?.status || 'unknown'}
-                <br/>
-                Count: {healthStatus.volunteers?.count || 0}
-                <br/>
-                Has Data: {healthStatus.volunteers?.has_data ? '✅' : '❌'}
-              </div>
-              
-              <div className={`p-2 rounded ${healthStatus.partners?.status === 'healthy' ? 'bg-green-100' : 'bg-red-100'}`}>
-                <strong>Partners:</strong> {healthStatus.partners?.status || 'unknown'}
-                <br/>
-                Count: {healthStatus.partners?.count || 0}
-                <br/>
-                Has Data: {healthStatus.partners?.has_data ? '✅' : '❌'}
+              {/* Netlify Status */}
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg text-xs">
+                <p className="font-medium">Netlify Status:</p>
+                <p>API: {import.meta.env.VITE_API_URL ? '✅ Connected' : '⚠️ Check Config'}</p>
+                <p>Password: ⚠️ Using Temporary Setup</p>
               </div>
             </div>
-          )}
-        </div>
-      )}
-
-      {/* Loading Indicator */}
-      {loading && (
-        <div className="bg-yellow-100 border border-yellow-400 rounded-lg p-4 mb-6 text-center">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
-            Loading data...
+            <form onSubmit={handleLogin}>
+              <div className="mb-6">
+                <input
+                  type="password"
+                  placeholder="Enter admin password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                />
+              </div>
+              <button 
+                type="submit" 
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition duration-200"
+              >
+                Login
+              </button>
+            </form>
           </div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* File Upload Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Upload Resources</h2>
-        <div className="flex items-center gap-4 mb-6">
-          <input
-            type="file"
-            onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-            className="flex-1 border border-gray-300 rounded-md px-3 py-2"
-          />
-          <button
-            onClick={handleFileUpload}
-            disabled={!uploadFile || uploading}
-            className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
+  // -----------------
+  // Admin Dashboard View
+  // -----------------
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-0 ${
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="flex items-center justify-between p-4 border-b">
+          <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
+          <button 
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
           >
-            {uploading ? 'Uploading...' : 'Upload File'}
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </div>
+        <nav className="p-4">
+          {[
+            { id: 'overview', name: 'Overview', icon: '📊' },
+            { id: 'volunteers', name: 'Volunteers', icon: '👥' },
+            { id: 'partners', name: 'Partners', icon: '🤝' },
+            { id: 'donations', name: 'Donations', icon: '💰' },
+            { id: 'files', name: 'File Manager', icon: '📁' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg mb-2 transition ${
+                activeTab === tab.id 
+                  ? 'bg-blue-50 text-blue-600 border border-blue-200' 
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <span className="text-lg">{tab.icon}</span>
+              <span className="font-medium">{tab.name}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
-        {/* Uploaded Files */}
-        <div>
-          <h3 className="text-lg font-medium mb-3">Uploaded Files ({uploadedFiles.length})</h3>
-          {uploadedFiles.length === 0 ? (
-            <p className="text-gray-500">No files uploaded yet.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {uploadedFiles.map((file) => (
-                <div key={file.id} className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium truncate flex-1" title={file.originalName}>
-                      {file.originalName}
-                    </h4>
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-0">
+        {/* Header */}
+        <header className="bg-white shadow-sm border-b">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center space-x-4">
+              <button 
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+            </div>
+            <button
+              onClick={() => setAuthenticated(false)}
+              className="px-4 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+
+        {/* Main Content Area */}
+        <main className="p-4 lg:p-6">
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="bg-white rounded-xl shadow-sm p-6 border">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <span className="text-2xl">👥</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Volunteers</p>
+                      <p className="text-2xl font-bold text-gray-900">{volunteers.length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm p-6 border">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <span className="text-2xl">🤝</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Partners</p>
+                      <p className="text-2xl font-bold text-gray-900">{partners.length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm p-6 border">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-purple-100 rounded-lg">
+                      <span className="text-2xl">💰</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Donations</p>
+                      <p className="text-2xl font-bold text-gray-900">{donations.length}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-xl shadow-sm p-6 border">
+                  <div className="flex items-center">
+                    <div className="p-3 bg-yellow-100 rounded-lg">
+                      <span className="text-2xl">📊</span>
+                    </div>
+                    <div className="ml-4">
+                      <p className="text-sm font-medium text-gray-600">Total Raised</p>
+                      <p className="text-2xl font-bold text-gray-900">Ksh {totalDonations.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Health Status */}
+              {healthStatus && (
+                <div className="bg-white rounded-xl shadow-sm p-6 border">
+                  <h2 className="text-lg font-semibold mb-4">System Health</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className={`p-4 rounded-lg border ${
+                      healthStatus.collections?.status === 'healthy' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Database</span>
+                        <span className={`w-3 h-3 rounded-full ${
+                          healthStatus.collections?.status === 'healthy' ? 'bg-green-500' : 'bg-red-500'
+                        }`}></span>
+                      </div>
+                    </div>
+                    <div className={`p-4 rounded-lg border ${
+                      healthStatus.volunteers?.status === 'healthy' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Volunteers API</span>
+                        <span className={`w-3 h-3 rounded-full ${
+                          healthStatus.volunteers?.status === 'healthy' ? 'bg-green-500' : 'bg-red-500'
+                        }`}></span>
+                      </div>
+                    </div>
+                    <div className={`p-4 rounded-lg border ${
+                      healthStatus.partners?.status === 'healthy' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Partners API</span>
+                        <span className={`w-3 h-3 rounded-full ${
+                          healthStatus.partners?.status === 'healthy' ? 'bg-green-500' : 'bg-red-500'
+                        }`}></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Volunteers Tab */}
+          {activeTab === 'volunteers' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm p-6 border">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
+                  <h2 className="text-xl font-semibold">Volunteers ({filteredVolunteers.length})</h2>
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Search volunteers..."
+                      value={volunteerSearch}
+                      onChange={(e) => setVolunteerSearch(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                     <button
-                      onClick={() => handleDeleteFile(file.id, file.originalName)}
-                      className="text-red-500 hover:text-red-700 ml-2"
-                      title="Delete file"
+                      onClick={downloadVolunteers}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition"
                     >
-                      ×
+                      <span>📥</span>
+                      <span>Export CSV</span>
                     </button>
                   </div>
-                  <p className="text-sm text-gray-500 mb-2">
-                    {(file.size / 1024 / 1024).toFixed(2)} MB
-                  </p>
-                  <a
-                    href={`${API_URL}${file.url}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 inline-block"
-                  >
-                    Download
-                  </a>
                 </div>
-              ))}
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b">
+                        <th className="py-3 px-4 text-left font-medium text-gray-600">Name</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600">Email</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600 hidden sm:table-cell">Phone</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600 hidden md:table-cell">Interest</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredVolunteers.map((volunteer, index) => (
+                        <tr key={index} className="border-b hover:bg-gray-50">
+                          <td className="py-3 px-4">
+                            <input
+                              type="text"
+                              value={volunteer.fullName || ''}
+                              onChange={(e) => handleEditChange('volunteer', index, 'fullName', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <input
+                              type="email"
+                              value={volunteer.email || ''}
+                              onChange={(e) => handleEditChange('volunteer', index, 'email', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4 hidden sm:table-cell">
+                            <input
+                              type="text"
+                              value={volunteer.phone || ''}
+                              onChange={(e) => handleEditChange('volunteer', index, 'phone', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4 hidden md:table-cell">
+                            <input
+                              type="text"
+                              value={volunteer.interest || ''}
+                              onChange={(e) => handleEditChange('volunteer', index, 'interest', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleSave('volunteer', index)}
+                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => handleDelete('volunteer', index)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Add Volunteer Form */}
+              <div className="bg-white rounded-xl shadow-sm p-6 border">
+                <h3 className="text-lg font-semibold mb-4">Add New Volunteer</h3>
+                <form onSubmit={handleAddVolunteer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={newVolunteer.fullName}
+                    onChange={(e) => setNewVolunteer({...newVolunteer, fullName: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={newVolunteer.email}
+                    onChange={(e) => setNewVolunteer({...newVolunteer, email: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone"
+                    value={newVolunteer.phone}
+                    onChange={(e) => setNewVolunteer({...newVolunteer, phone: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Interest"
+                    value={newVolunteer.interest}
+                    onChange={(e) => setNewVolunteer({...newVolunteer, interest: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <textarea
+                    placeholder="Message"
+                    value={newVolunteer.message}
+                    onChange={(e) => setNewVolunteer({...newVolunteer, message: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent md:col-span-2"
+                    rows={3}
+                  />
+                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition md:col-span-2">
+                    Add Volunteer
+                  </button>
+                </form>
+              </div>
             </div>
           )}
-        </div>
+
+          {/* Partners Tab */}
+          {activeTab === 'partners' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm p-6 border">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
+                  <h2 className="text-xl font-semibold">Partners ({filteredPartners.length})</h2>
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Search partners..."
+                      value={partnerSearch}
+                      onChange={(e) => setPartnerSearch(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <button
+                      onClick={downloadPartners}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition"
+                    >
+                      <span>📥</span>
+                      <span>Export CSV</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-gray-50 border-b">
+                        <th className="py-3 px-4 text-left font-medium text-gray-600">Organization</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600 hidden md:table-cell">Contact</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600">Email</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600 hidden lg:table-cell">Type</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-600">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredPartners.map((partner, index) => (
+                        <tr key={index} className="border-b hover:bg-gray-50">
+                          <td className="py-3 px-4">
+                            <input
+                              type="text"
+                              value={partner.organization || ''}
+                              onChange={(e) => handleEditChange('partner', index, 'organization', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4 hidden md:table-cell">
+                            <input
+                              type="text"
+                              value={partner.contactPerson || ''}
+                              onChange={(e) => handleEditChange('partner', index, 'contactPerson', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <input
+                              type="email"
+                              value={partner.email || ''}
+                              onChange={(e) => handleEditChange('partner', index, 'email', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4 hidden lg:table-cell">
+                            <input
+                              type="text"
+                              value={partner.partnershipType || ''}
+                              onChange={(e) => handleEditChange('partner', index, 'partnershipType', e.target.value)}
+                              className="w-full bg-transparent border-none focus:ring-1 focus:ring-blue-500 rounded"
+                            />
+                          </td>
+                          <td className="py-3 px-4">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleSave('partner', index)}
+                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => handleDelete('partner', index)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Add Partner Form */}
+              <div className="bg-white rounded-xl shadow-sm p-6 border">
+                <h3 className="text-lg font-semibold mb-4">Add New Partner</h3>
+                <form onSubmit={handleAddPartner} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Organization"
+                    value={newPartner.organization}
+                    onChange={(e) => setNewPartner({...newPartner, organization: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Contact Person"
+                    value={newPartner.contactPerson}
+                    onChange={(e) => setNewPartner({...newPartner, contactPerson: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={newPartner.email}
+                    onChange={(e) => setNewPartner({...newPartner, email: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone"
+                    value={newPartner.phone}
+                    onChange={(e) => setNewPartner({...newPartner, phone: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Partnership Type"
+                    value={newPartner.partnershipType}
+                    onChange={(e) => setNewPartner({...newPartner, partnershipType: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <textarea
+                    placeholder="Message"
+                    value={newPartner.message}
+                    onChange={(e) => setNewPartner({...newPartner, message: e.target.value})}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent md:col-span-2"
+                    rows={3}
+                  />
+                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition md:col-span-2">
+                    Add Partner
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Donations Tab */}
+          {activeTab === 'donations' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm p-6 border">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 space-y-4 lg:space-y-0">
+                  <div>
+                    <h2 className="text-xl font-semibold">Donations ({filteredDonations.length})</h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Total Amount: <span className="font-bold text-green-600">Ksh {totalDonations.toLocaleString()}</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+                    <input
+                      type="text"
+                      placeholder="Search donations..."
+                      value={donationSearch}
+                      onChange={(e) => setDonationSearch(e.target.value)}
+                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <button
+                      onClick={downloadDonations}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition"
+                    >
+                      <span>📥</span>
+                      <span>Export CSV</span>
+                    </button>
+                  </div>
+                </div>
+
+                {filteredDonations.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No donations found.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gray-50 border-b">
+                          <th className="py-3 px-4 text-left font-medium text-gray-600">Donor</th>
+                          <th className="py-3 px-4 text-left font-medium text-gray-600 hidden sm:table-cell">Email</th>
+                          <th className="py-3 px-4 text-left font-medium text-gray-600">Amount</th>
+                          <th className="py-3 px-4 text-left font-medium text-gray-600 hidden md:table-cell">Method</th>
+                          <th className="py-3 px-4 text-left font-medium text-gray-600 hidden lg:table-cell">Date</th>
+                          <th className="py-3 px-4 text-left font-medium text-gray-600">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredDonations.map((donation, index) => (
+                          <tr key={index} className="border-b hover:bg-gray-50">
+                            <td className="py-3 px-4">
+                              {donation.fullName || donation.name || 'N/A'}
+                            </td>
+                            <td className="py-3 px-4 hidden sm:table-cell">
+                              {donation.email || 'N/A'}
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className="font-medium">
+                                {donation.currency || 'KES'} {parseFloat(donation.amount || 0).toLocaleString()}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 hidden md:table-cell">
+                              {donation.paymentMethod || 'N/A'}
+                            </td>
+                            <td className="py-3 px-4 hidden lg:table-cell">
+                              {donation.timestamp ? new Date(donation.timestamp).toLocaleDateString() : 
+                               donation.createdAt ? new Date(donation.createdAt).toLocaleDateString() : 'N/A'}
+                            </td>
+                            <td className="py-3 px-4">
+                              <button
+                                onClick={() => handleDelete('donation', index)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* File Manager Tab */}
+          {activeTab === 'files' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl shadow-sm p-6 border">
+                <h2 className="text-xl font-semibold mb-4">Upload Resources</h2>
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+                  <input
+                    type="file"
+                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <button
+                    onClick={handleFileUpload}
+                    disabled={!uploadFile || uploading}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition"
+                  >
+                    {uploading ? 'Uploading...' : 'Upload File'}
+                  </button>
+                </div>
+
+                <h3 className="text-lg font-medium mb-3">Uploaded Files ({uploadedFiles.length})</h3>
+                {uploadedFiles.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No files uploaded yet.</p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {uploadedFiles.map((file) => (
+                      <div key={file.id} className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-medium truncate flex-1" title={file.originalName}>
+                            {file.originalName}
+                          </h4>
+                          <button
+                            onClick={() => handleDeleteFile(file.id, file.originalName)}
+                            className="text-red-500 hover:text-red-700 ml-2 transition"
+                            title="Delete file"
+                          >
+                            ×
+                          </button>
+                        </div>
+                        <p className="text-sm text-gray-500 mb-2">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                        <a
+                          href={`${API_URL}${file.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm transition inline-block"
+                        >
+                          Download
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </main>
       </div>
 
-      {/* Add Volunteer Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Add New Volunteer</h2>
-        <form onSubmit={handleAddVolunteer} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={newVolunteer.fullName}
-            onChange={(e) => setNewVolunteer({...newVolunteer, fullName: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newVolunteer.email}
-            onChange={(e) => setNewVolunteer({...newVolunteer, email: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Phone"
-            value={newVolunteer.phone}
-            onChange={(e) => setNewVolunteer({...newVolunteer, phone: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Interest"
-            value={newVolunteer.interest}
-            onChange={(e) => setNewVolunteer({...newVolunteer, interest: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-          />
-          <textarea
-            placeholder="Message"
-            value={newVolunteer.message}
-            onChange={(e) => setNewVolunteer({...newVolunteer, message: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2 md:col-span-2"
-            rows={3}
-          />
-          <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 md:col-span-2">
-            Add Volunteer
-          </button>
-        </form>
-      </div>
-
-      {/* Add Partner Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold mb-4">Add New Partner</h2>
-        <form onSubmit={handleAddPartner} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="Organization"
-            value={newPartner.organization}
-            onChange={(e) => setNewPartner({...newPartner, organization: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Contact Person"
-            value={newPartner.contactPerson}
-            onChange={(e) => setNewPartner({...newPartner, contactPerson: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={newPartner.email}
-            onChange={(e) => setNewPartner({...newPartner, email: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="tel"
-            placeholder="Phone"
-            value={newPartner.phone}
-            onChange={(e) => setNewPartner({...newPartner, phone: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Partnership Type"
-            value={newPartner.partnershipType}
-            onChange={(e) => setNewPartner({...newPartner, partnershipType: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2"
-          />
-          <textarea
-            placeholder="Message"
-            value={newPartner.message}
-            onChange={(e) => setNewPartner({...newPartner, message: e.target.value})}
-            className="border border-gray-300 rounded-md px-3 py-2 md:col-span-2"
-            rows={3}
-          />
-          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 md:col-span-2">
-            Add Partner
-          </button>
-        </form>
-      </div>
-
-      {/* Volunteers Table */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Volunteers ({filteredVolunteers.length})</h2>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search volunteers..."
-              value={volunteerSearch}
-              onChange={(e) => setVolunteerSearch(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 w-64"
-            />
-            <button
-              onClick={downloadVolunteers}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
-            >
-              📥 Download CSV
-            </button>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('fullName'); setVolunteerSortAsc(!volunteerSortAsc); }}>
-                  Name {volunteerSortKey === 'fullName' && (volunteerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('email'); setVolunteerSortAsc(!volunteerSortAsc); }}>
-                  Email {volunteerSortKey === 'email' && (volunteerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('phone'); setVolunteerSortAsc(!volunteerSortAsc); }}>
-                  Phone {volunteerSortKey === 'phone' && (volunteerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setVolunteerSortKey('interest'); setVolunteerSortAsc(!volunteerSortAsc); }}>
-                  Interest {volunteerSortKey === 'interest' && (volunteerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredVolunteers.map((volunteer, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="text"
-                      value={volunteer.fullName || ''}
-                      onChange={(e) => handleEditChange('volunteer', index, 'fullName', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="email"
-                      value={volunteer.email || ''}
-                      onChange={(e) => handleEditChange('volunteer', index, 'email', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="text"
-                      value={volunteer.phone || ''}
-                      onChange={(e) => handleEditChange('volunteer', index, 'phone', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="text"
-                      value={volunteer.interest || ''}
-                      onChange={(e) => handleEditChange('volunteer', index, 'interest', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleSave('volunteer', index)}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => handleDelete('volunteer', index)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Partners Table */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Partners ({filteredPartners.length})</h2>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search partners..."
-              value={partnerSearch}
-              onChange={(e) => setPartnerSearch(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 w-64"
-            />
-            <button
-              onClick={downloadPartners}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
-            >
-              📥 Download CSV
-            </button>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('organization'); setPartnerSortAsc(!partnerSortAsc); }}>
-                  Organization {partnerSortKey === 'organization' && (partnerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('contactPerson'); setPartnerSortAsc(!partnerSortAsc); }}>
-                  Contact Person {partnerSortKey === 'contactPerson' && (partnerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('email'); setPartnerSortAsc(!partnerSortAsc); }}>
-                  Email {partnerSortKey === 'email' && (partnerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setPartnerSortKey('partnershipType'); setPartnerSortAsc(!partnerSortAsc); }}>
-                  Type {partnerSortKey === 'partnershipType' && (partnerSortAsc ? '↑' : '↓')}
-                </th>
-                <th className="py-2 px-4 border-b">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPartners.map((partner, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="text"
-                      value={partner.organization || ''}
-                      onChange={(e) => handleEditChange('partner', index, 'organization', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="text"
-                      value={partner.contactPerson || ''}
-                      onChange={(e) => handleEditChange('partner', index, 'contactPerson', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="email"
-                      value={partner.email || ''}
-                      onChange={(e) => handleEditChange('partner', index, 'email', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <input
-                      type="text"
-                      value={partner.partnershipType || ''}
-                      onChange={(e) => handleEditChange('partner', index, 'partnershipType', e.target.value)}
-                      className="w-full border-none bg-transparent"
-                    />
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleSave('partner', index)}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => handleDelete('partner', index)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Donations Table */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">Donations ({filteredDonations.length})</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Total Amount: <span className="font-bold text-green-600">Ksh {totalDonations.toLocaleString()}</span>
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Search donations..."
-              value={donationSearch}
-              onChange={(e) => setDonationSearch(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 w-64"
-            />
-            <button
-              onClick={downloadDonations}
-              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
-            >
-              📥 Download CSV
-            </button>
-          </div>
-        </div>
-        
-        {filteredDonations.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No donations found.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('fullName'); setDonationSortAsc(!donationSortAsc); }}>
-                    Donor Name {donationSortKey === 'fullName' && (donationSortAsc ? '↑' : '↓')}
-                  </th>
-                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('email'); setDonationSortAsc(!donationSortAsc); }}>
-                    Email {donationSortKey === 'email' && (donationSortAsc ? '↑' : '↓')}
-                  </th>
-                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('amount'); setDonationSortAsc(!donationSortAsc); }}>
-                    Amount {donationSortKey === 'amount' && (donationSortAsc ? '↑' : '↓')}
-                  </th>
-                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('paymentMethod'); setDonationSortAsc(!donationSortAsc); }}>
-                    Method {donationSortKey === 'paymentMethod' && (donationSortAsc ? '↑' : '↓')}
-                  </th>
-                  <th className="py-2 px-4 border-b cursor-pointer" onClick={() => { setDonationSortKey('timestamp'); setDonationSortAsc(!donationSortAsc); }}>
-                    Date {donationSortKey === 'timestamp' && (donationSortAsc ? '↑' : '↓')}
-                  </th>
-                  <th className="py-2 px-4 border-b">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDonations.map((donation, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="py-2 px-4 border-b">
-                      {donation.fullName || donation.name || 'N/A'}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {donation.email || 'N/A'}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {donation.currency || 'KES'} {parseFloat(donation.amount || 0).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {donation.paymentMethod || 'N/A'}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      {donation.timestamp ? new Date(donation.timestamp).toLocaleDateString() : 
-                       donation.createdAt ? new Date(donation.createdAt).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="py-2 px-4 border-b">
-                      <button
-                        onClick={() => handleDelete('donation', index)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
     </div>
   );
 };
