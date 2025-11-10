@@ -49,7 +49,8 @@ const AdminDashboard: React.FC = () => {
   const [healthStatus, setHealthStatus] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  const correctPassword = 'Alfaromeo001@';
+  // CORRECTED: Using environment variable for password
+  const correctPassword = import.meta.env.VITE_ADMIN_PASSWORD;
 
   // -----------------
   // Download Functions
