@@ -6,5 +6,5 @@
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:**  python
 
