@@ -31,14 +31,14 @@ const AboutPage: React.FC = () => {
                 Lucky Kitonyi
               </h2>
               <p className="font-medium text-gray-500 mb-4">
-                Founder & Visionary
+                Youth Cordinator
               </p>
               <div className="text-left space-y-4 text-gray-700 leading-relaxed text-sm sm:text-base">
                 <p>
-                  Eng. Lucky Kitonyi, a proud native of Kibauni Ward in Mwala, is the visionary founder of Smart Education. Having grown up in the very community she now serves, Lucky witnessed firsthand the immense potential and the significant challenges faced by young students. Her personal journey fueled a deep-seated passion to create pathways for others to succeed.
+                  Eng. Lucky Kitonyi, a proud native of Kibauni Ward in Mwala, is the cordinator of Smart Education. Having grown up in the very community she now serves, Lucky witnessed firsthand the immense potential and the significant challenges faced by young students. Her personal journey fueled a deep-seated passion to create pathways for others to succeed.
                 </p>
                 <p>
-                  She started this initiative to bridge the gap between potential and opportunity, believing that with the right mentorship, motivation, and resources, every child can achieve their dreams.
+                  She is a member of this initiative to bridge the gap between potential and opportunity, believing that with the right mentorship, motivation, and resources, every child can achieve their dreams.
                 </p>
                 <p className="font-semibold text-center pt-4 italic text-bright-blue-800">
                   "We are not just giving handouts; we are lighting a fire of ambition and hope in the hearts of our future leaders."
@@ -58,11 +58,11 @@ const AboutPage: React.FC = () => {
                 Kevin Muli
               </h2>
               <p className="font-medium text-gray-500 mb-4">
-                Co-Founder & Tech Lead
+                Founder & Tech Lead
               </p>
               <div className="text-left space-y-4 text-gray-700 leading-relaxed text-sm sm:text-base">
                 <p>
-                  Kevin Muli, a skilled Software Engineer also hailing from Kibauni, co-founded Smart Education with a shared vision. He brings a powerful perspective on the role of technology and modern skills in education and is deeply passionate about mentoring young minds to thrive in a digital world.
+                  Kevin Muli, a skilled Software Engineer also hailing from Kibauni, founded Smart Education with a shared vision. He brings a powerful perspective on the role of technology and modern skills in education and is deeply passionate about mentoring young minds to thrive in a digital world.
                 </p>
                 <p>
                   His expertise helps shape programs that are not only inspirational but also practical, preparing students for future careers and ensuring they have access to the same opportunities as their urban counterparts.
