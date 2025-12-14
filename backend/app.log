@@ -290,3 +290,25 @@
 2025-11-02 02:29:30,216 INFO: \u2705 Connected to MongoDB successfully
 2025-11-02 02:29:30,259 WARNING:  * Debugger is active!
 2025-11-02 02:29:30,263 INFO:  * Debugger PIN: 705-387-221
+2025-12-15 01:19:23,960 INFO: \u2705 Connected to MongoDB successfully
+2025-12-15 01:19:25,463 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-12-15 01:19:25,464 INFO: [33mPress CTRL+C to quit[0m
+2025-12-15 01:19:25,469 INFO:  * Restarting with stat
+2025-12-15 01:19:31,049 INFO: \u2705 Connected to MongoDB successfully
+2025-12-15 01:19:31,104 WARNING:  * Debugger is active!
+2025-12-15 01:19:31,109 INFO:  * Debugger PIN: 900-189-527
+2025-12-15 01:20:35,650 INFO: 127.0.0.1 - - [15/Dec/2025 01:20:35] "[33mGET /api/health HTTP/1.1[0m" 404 -
+2025-12-15 01:20:35,894 INFO: 127.0.0.1 - - [15/Dec/2025 01:20:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-15 01:24:05,986 INFO: \u2705 Connected to MongoDB successfully
+2025-12-15 01:24:07,341 INFO: [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.102:5000
+2025-12-15 01:24:07,341 INFO: [33mPress CTRL+C to quit[0m
+2025-12-15 01:24:07,343 INFO:  * Restarting with stat
+2025-12-15 01:24:12,686 INFO: \u2705 Connected to MongoDB successfully
+2025-12-15 01:24:12,731 WARNING:  * Debugger is active!
+2025-12-15 01:24:12,734 INFO:  * Debugger PIN: 900-189-527

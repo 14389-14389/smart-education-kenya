@@ -37,8 +37,8 @@ const ProgramsPage: React.FC = () => {
   const volunteerMessage = encodeURIComponent("Hello, I’m interested in volunteering with Smart Education Kenya.");
   const partnerMessage = encodeURIComponent("Hello, I’d like to partner with Smart Education Kenya.");
 
-  const whatsappVolunteerURL = `https://wa.me/254742180636?text=${volunteerMessage}`;
-  const whatsappPartnerURL = `https://wa.me/254742180636?text=${partnerMessage}`;
+  const whatsappVolunteerURL = `https://wa.me/254726894129?text=${volunteerMessage}`;
+  const whatsappPartnerURL = `https://wa.me/254726894129?text=${partnerMessage}`;
 
   return (
     <AnimatedPage>

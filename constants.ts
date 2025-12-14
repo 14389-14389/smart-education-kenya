@@ -35,7 +35,7 @@ export const PROGRAMS_DATA = [
   },
   {
     id: 'student-awards-recognition',
-    imageSrc: '/assets/student awards.jpg',
+    imageSrc: '/assets/student awards.png',
     title: 'Student Awards & Recognition',
     shortDescription:
       'Awarding top-performing and committed students to foster a spirit of excellence and keep them motivated.',
@@ -50,7 +50,7 @@ export const PROGRAMS_DATA = [
   },
   {
     id: 'girls-dignity-project',
-    imageSrc: '/assets/girls dignity project.jpg',
+    imageSrc: '/assets/girls dignity project.png',
     title: 'Girls’ Dignity Project',
     shortDescription:
       'Providing sanitary pads to ensure girls can attend school with dignity and without interruption.',
