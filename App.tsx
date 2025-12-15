@@ -2,21 +2,21 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import HomePage from './pages/HomePage'; // Might need .jsx extension
-import AboutPage from './pages/AboutPage'; // Might need .jsx extension
-import ProgramsPage from './pages/ProgramsPage'; // Might need .jsx extension
-import ProgramDetailPage from './pages/ProgramDetailPage'; // Might need .jsx extension
-import GalleryPage from './pages/GalleryPage'; // Might need .jsx extension
-import BlogPage from './pages/BlogPage'; // Might need .jsx extension
-import DonatePage from './pages/DonatePage'; // Might need .jsx extension
-import GetInvolvedPage from './pages/GetInvolvedPage'; // This exists as .jsx
-import ContactPage from './pages/ContactPage'; // Might need .jsx extension
-import AdminDashboard from './pages/AdminDashboard'; // Might need .jsx extension
-import NotFoundPage from './pages/NotFoundPage'; // This exists as .tsx
+import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
+import ProgramsPage from './pages/ProgramsPage';
+import ProgramDetailPage from './pages/ProgramDetailPage';
+import GalleryPage from './pages/GalleryPage';
+import BlogPage from './pages/BlogPage';
+import DonatePage from './pages/DonatePage';
+import GetInvolvedPage from './pages/GetInvolvedPage';
+import ContactPage from './pages/ContactPage';
+import AdminDashboard from './pages/AdminDashboard';
+import NotFoundPage from './pages/NotFoundPage'; // ✅ Make sure this is correct
 
 const App: React.FC = () => {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin'); // ✅ This is correct
 
   return (
     <div className="bg-white text-gray-800 font-body min-h-screen flex flex-col">
