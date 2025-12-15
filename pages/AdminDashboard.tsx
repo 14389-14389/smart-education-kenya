@@ -575,7 +575,7 @@ const AdminDashboard: React.FC = () => {
                 </svg>
               </div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Admin Dashboard
+                Admin
               </h1>
               <p className="text-gray-600 mt-3 text-lg">Enter your password to continue</p>
             </div>

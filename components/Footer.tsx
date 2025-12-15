@@ -2,7 +2,7 @@ import React from 'react';
 import { WhatsAppIcon, TwitterIcon, FacebookIcon } from './icons';
 
 const SOCIAL_LINKS = {
-  whatsapp: 'https://wa.me/254742180636',
+  whatsapp: 'https://wa.me/25426894129',
   twitter: 'https://twitter.com/SmartEducationKenya', // ✅ Updated
   facebook: 'https://www.facebook.com/SmartEducationKenya', // ✅ Updated
 };
@@ -30,8 +30,8 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="tel:+254742180636" className="hover:text-white transition">
-                  +254 742 180 636
+                <a href="tel:+254726894129" className="hover:text-white transition">
+                  +254 726894129
                 </a>
               </li>
               <li>Kibauni, Mwala, Kenya</li>

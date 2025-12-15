@@ -6,7 +6,7 @@ export const NAV_LINKS = [
   { href: '/blog', label: 'Blog' },
   { href: '/get-involved', label: 'Get Involved' },
   { href: '/contact', label: 'Contact' },
-  { href: '/admin', label: 'Admin Dashboard' }, // ✅ Added Admin link
+  // ❌ Admin Dashboard removed - only accessible via direct URL: /admin
   { href: '/donate', label: 'Donate' },
 ];
 
@@ -15,7 +15,6 @@ export const SOCIAL_LINKS = {
   twitter: 'https://twitter.com/smarteducation',
   facebook: 'https://facebook.com/smarteducation',
 };
-
 
 export const PROGRAMS_DATA = [
   {
@@ -51,7 +50,7 @@ export const PROGRAMS_DATA = [
   {
     id: 'girls-dignity-project',
     imageSrc: '/assets/girls dignity project.png',
-    title: 'Girls’ Dignity Project',
+    title: 'Girls\' Dignity Project',
     shortDescription:
       'Providing sanitary pads to ensure girls can attend school with dignity and without interruption.',
     longDescription:
@@ -95,7 +94,7 @@ export const GALLERY_IMAGES = [
   {
     id: 3,
     src: '/assets/kyeni2.jpg',
-    alt: 'Smart Education team distributing sanitary pads under the Girls’ Dignity Project to empower schoolgirls.',
+    alt: 'Smart Education team distributing sanitary pads under the Girls\' Dignity Project to empower schoolgirls.',
   },
   {
     id: 4,
@@ -178,6 +177,6 @@ export const BLOG_POSTS = [
     image: '/assets/kyeni6.jpg',
     date: 'September 30, 2024',
     excerpt:
-      "When a girl is educated, she transforms her life, her family, and her community. Learn why the Girls’ Dignity Project is vital in breaking educational barriers for girls.",
+      "When a girl is educated, she transforms her life, her family, and her community. Learn why the Girls' Dignity Project is vital in breaking educational barriers for girls.",
   },
 ];

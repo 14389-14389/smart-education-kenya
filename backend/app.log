@@ -312,3 +312,11 @@
 2025-12-15 01:24:12,686 INFO: \u2705 Connected to MongoDB successfully
 2025-12-15 01:24:12,731 WARNING:  * Debugger is active!
 2025-12-15 01:24:12,734 INFO:  * Debugger PIN: 900-189-527
+2025-12-15 01:27:12,657 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:12] "GET /api/view/volunteer HTTP/1.1" 200 -
+2025-12-15 01:27:12,744 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:12] "GET /api/view/partner HTTP/1.1" 200 -
+2025-12-15 01:27:12,871 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:12] "GET /api/health/collections HTTP/1.1" 200 -
+2025-12-15 01:27:13,159 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:13] "GET /api/health/volunteers HTTP/1.1" 200 -
+2025-12-15 01:27:13,371 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:13] "GET /api/health/partners HTTP/1.1" 200 -
+2025-12-15 01:27:13,697 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:13] "GET /api/view/donations HTTP/1.1" 200 -
+2025-12-15 01:27:13,730 INFO: 127.0.0.1 - - [15/Dec/2025 01:27:13] "GET /api/files HTTP/1.1" 200 -
+2025-12-15 01:31:37,894 INFO: 127.0.0.1 - - [15/Dec/2025 01:31:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
