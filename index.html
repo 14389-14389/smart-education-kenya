@@ -2,82 +2,65 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <meta name="google-site-verification" content="2hYydOarJhZRYRZXJUNAXilXccsi-PiuxLhgOX_UdS4" />
-    <title>Smart Education</title>
-
-    <!-- ✅ TailwindCSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- ✅ Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Roboto:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- ✅ Tailwind Custom Config -->
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Poppins', 'sans-serif'],
-              body: ['Roboto', 'sans-serif'],
-            },
-            colors: {
-              'bright-blue': {
-                50: '#f0f8ff',
-                100: '#e0f2fe',
-                200: '#bae6fd',
-                300: '#7dd3fc',
-                400: '#38bdf8',
-                500: '#0ea5e9',
-                600: '#0284c7',
-                700: '#0369a1',
-                800: '#075985',
-                900: '#0c4a6e',
-              },
-            },
-            keyframes: {
-              slideDown: {
-                '0%': { transform: 'translateY(-100%)' },
-                '100%': { transform: 'translateY(0)' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(0)' },
-                '100%': { transform: 'translateY(-100%)' },
-              },
-            },
-            animation: {
-              slideDown: 'slideDown 0.4s ease-out forwards',
-              slideUp: 'slideUp 0.4s ease-in forwards',
-            },
-          },
-        },
-      };
-    </script>
-
-    <!-- ✅ Import maps for React -->
-    <script type="importmap">
-    {
-      "imports": {
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
-        "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.3"
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right, #0284c7, #0ea5e9);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
       }
-    }
-    </script>
+      .countdown {
+        font-size: 2rem;
+        margin-top: 20px;
+        font-weight: bold;
+      }
+    </style>
   </head>
+  <body>
+    <h1 class="text-4xl font-bold mb-4"> 🚧</h1>
+    <p class="text-lg"></p>
 
-  <body class="antialiased font-body bg-white">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <div class="countdown" id="countdown"></div>
+
+    <script>
+      // Set countdown for 7 days from now
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 7);
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance <= 0) {
+          document.getElementById("countdown").innerHTML = "✅ We're back online!";
+          clearInterval(interval);
+
+          // Redirect to the main website after 3 seconds
+          setTimeout(() => {
+            window.location.href = "index-original.html";
+          }, 3000);
+          return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML =
+          `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      }
+
+      const interval = setInterval(updateCountdown, 1000);
+      updateCountdown();
+    </script>
   </body>
 </html>
-
